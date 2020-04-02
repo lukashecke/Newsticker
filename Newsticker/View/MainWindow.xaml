@@ -1,0 +1,101 @@
+﻿<Window x:Class="Newsticker.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Newsticker"
+        mc:Ignorable="d"
+        Title="Newsticker"
+        Height="450" 
+        Width="800"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        BorderThickness="0">
+    <Window.Resources>
+        <SolidColorBrush x:Key="VisualStudioGray" Color="#FF2D2D30"/>
+    </Window.Resources>
+    <Grid Background="{StaticResource VisualStudioGray}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="11*"/>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0" MouseLeftButtonDown="DockPanel_MouseLeftButtonDown" Background="DarkBlue" Height="auto">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="5*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" FlowDirection="LeftToRight">
+                    <Image Source="/Images/newspaper.png" Margin="5"/>
+                    <Button Command="{Binding TagesschauCommand}" BorderThickness="0" Background="Transparent">
+                        <Image Source="/Images/tagesschau.png" Margin="5"/>
+                    </Button>
+                    <Button Command="{Binding FAZCommand}" BorderThickness="0" Background="Transparent">
+                        <Image Source="/Images/faz.png" Margin="5"/>
+                    </Button>
+                    <Button Command="{Binding SZCommand}" BorderThickness="0" Background="Transparent">
+                        <Image Source="/Images/sz.png" Margin="5,8,5,5"/>
+                    </Button>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" FlowDirection="RightToLeft">
+                    <Button Background="Transparent" BorderThickness="0" Command="{Binding CloseCommand}">
+                        <Image Source="/Images/close.png" Margin="10"/>
+                    </Button>
+                    <Button Background="Transparent" BorderThickness="0" Command="{Binding MinimizeCommand}">
+                        <Image Source="/Images/minimize.png" Margin="10"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </DockPanel>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Articles}" >
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Background="White" Margin="5">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="2.5*"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Source="{Binding ImageSource}" 
+                                       Grid.Column="0" 
+                                       Grid.RowSpan="4"
+                                       Margin="5"/>
+                                <TextBlock Text="{Binding Date, StringFormat='{}{0:dd.MM.yyyy | hh:mm U\\hr}'}" Grid.Column="1" Grid.Row="0"/>
+                                <TextBlock Text="{Binding Header}"
+                                       Grid.Row="1"
+                                       Grid.Column="1"
+                                       TextWrapping="Wrap"
+                                       FontWeight="Bold"/>
+                                <TextBlock Text="{Binding Summary}"
+                                       Grid.Row="2"
+                                       Grid.Column="1"
+                                       TextWrapping="Wrap"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1">
+                                    <Hyperlink NavigateUri="{Binding Link}" RequestNavigate="Hyperlink_RequestNavigate">
+                                        <Hyperlink.Inlines>
+                                            <Run Text="Zum Artikel"/>
+                                        </Hyperlink.Inlines>
+                                </Hyperlink>
+                                </TextBlock>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+            <!--<FlowDocumentPageViewer/>-->
+            <TextBox Grid.Column="1" Name="WeatherFeed" TextWrapping="Wrap"/>
+            <!--<WebBrowser Grid.Column="1" Source="http://wetter.com/wetter_rss/wetter.xml"/>-->
+        </Grid>
+    </Grid>
+</Window>
