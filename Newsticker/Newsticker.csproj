@@ -126,5 +126,14 @@
   <ItemGroup>
     <Resource Include="Images\sz.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\cnn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\restore.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\maximize.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

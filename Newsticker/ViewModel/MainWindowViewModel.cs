@@ -20,10 +20,12 @@ namespace Newsticker.ViewModel
     {
         #region Commands
         public ICommand CloseCommand { get; set; }
+        public ICommand RestoreCommand { get; set; }
         public ICommand MinimizeCommand { get; set; }
         public ICommand TagesschauCommand { get; set; }
         public ICommand FAZCommand { get; set; }
         public ICommand SZCommand { get; set; }
+        public ICommand CNNCommand { get; set; }
         #endregion
 
         private ObservableCollection<ArticleModel> articles;
@@ -43,17 +45,53 @@ namespace Newsticker.ViewModel
                 this.OnPropertyChanged("Articles");
             }
         }
+        private string restoreButton;
+        public string RestoreButton
+        {
+            get
+            {
+                if (this.restoreButton == null)
+                {
+                    this.restoreButton = "/Images/maximize.png";
+                }
+                return this.restoreButton;
+            }
+            set
+            {
+                this.restoreButton = value;
+                this.OnPropertyChanged("RestoreButton");
+            }
+        }
 
         public MainWindowViewModel()
         {
             this.CloseCommand = new RelayCommand(ExecuteCloseCommand, CanExecuteClose);
+            this.RestoreCommand = new RelayCommand(ExecuteRestoreCommand, CanExecuteRestore);
             this.MinimizeCommand = new RelayCommand(ExecuteMinimizeCommand, CanExecuteMinimize);
             this.TagesschauCommand = new RelayCommand(ExecuteTagesschauCommand, CanExecuteTagesschau);
             this.FAZCommand = new RelayCommand(ExecuteFAZCommand, CanExecuteFAZ);
             this.SZCommand = new RelayCommand(ExecuteSZCommand, CanExecuteSZ);
+            this.CNNCommand = new RelayCommand(ExecuteCNNCommand, CanExecuteCNN);
         }
 
+        
 
+        private void ExecuteCNNCommand(object obj)
+        {
+            using (XmlReader reader = XmlReader.Create("http://rss.cnn.com/rss/edition.rss"))
+            {
+                Articles.Clear();
+                SyndicationFeed feed = SyndicationFeed.Load(reader);
+                foreach (var item in feed.Items)
+                {
+                    Articles.Add(new ArticleModel
+                    {
+                        Header = item.Title.Text,
+                        Link = item.Id
+                    });
+                }
+            };
+        }
 
         private void ExecuteSZCommand(object obj)
         {
@@ -134,7 +172,19 @@ namespace Newsticker.ViewModel
         {
             Application.Current.MainWindow.WindowState = WindowState.Minimized;
         }
-
+        private void ExecuteRestoreCommand(object obj)
+        {
+            if (Application.Current.MainWindow.WindowState == WindowState.Maximized)
+            {
+                Application.Current.MainWindow.WindowState = WindowState.Normal;
+                RestoreButton = "/Images/maximize.png";
+            }
+            else
+            {
+                Application.Current.MainWindow.WindowState = WindowState.Maximized;
+                RestoreButton = "/Images/restore.png";
+            }
+        }
         private void ExecuteCloseCommand(object obj)
         {
             Application.Current.MainWindow.Close();
@@ -142,6 +192,10 @@ namespace Newsticker.ViewModel
 
         #region CanExecutes
         private bool CanExecuteClose(object arg)
+        {
+            return true;
+        }
+        private bool CanExecuteRestore(object arg)
         {
             return true;
         }
@@ -160,6 +214,10 @@ namespace Newsticker.ViewModel
         private bool CanExecuteSZ(object arg)
         {
             return true;
+        }
+        private bool CanExecuteCNN(object arg)
+        {
+            return true; ;
         }
         #endregion
     }
