@@ -1,4 +1,5 @@
-﻿using Newsticker.Commands;
+﻿using HtmlAgilityPack;
+using Newsticker.Commands;
 using Newsticker.Models;
 using Newsticker.View;
 using System;
@@ -12,6 +13,7 @@ using System.Web;
 using System.Web.UI.HtmlControls;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Xml;
 
 namespace Newsticker.ViewModel
@@ -74,10 +76,11 @@ namespace Newsticker.ViewModel
             this.CNNCommand = new RelayCommand(ExecuteCNNCommand, CanExecuteCNN);
         }
 
-        
+
 
         private void ExecuteCNNCommand(object obj)
         {
+            // TODO: Generell überall auf null und so abfragen den rss Feed
             using (XmlReader reader = XmlReader.Create("http://rss.cnn.com/rss/edition.rss"))
             {
                 Articles.Clear();
@@ -87,7 +90,9 @@ namespace Newsticker.ViewModel
                     Articles.Add(new ArticleModel
                     {
                         Header = item.Title.Text,
-                        Link = item.Id
+                        Summary = item.Summary?.Text,
+                        Link = item.Id,
+                        Date = item.PublishDate.DateTime
                     });
                 }
             };
@@ -101,21 +106,27 @@ namespace Newsticker.ViewModel
                 SyndicationFeed feed = SyndicationFeed.Load(reader);
                 foreach (var item in feed.Items)
                 {
-                    //XmlDocument xmlDocument = new XmlDocument();
-                    //xmlDocument.LoadXml("<root>"+item.Summary.Text+"</root>");
-                    //var image = xmlDocument.GetElementsByTagName("root");
-
-                    // TODO: Das hier über HTML bzw. XML lösen, keine Stringspielereien!
-                    string temp = item.Summary.Text.Substring(10);
-                    string temp2 = temp.Substring(0, temp.IndexOf('"'));
+                    var doc = new HtmlDocument();
+                    doc.LoadHtml(item.Summary.Text);
+                    string imageSource = string.Empty;
+                    string summary = string.Empty;
+                    // TODO: TryCatch Summary und ImageUrl trennen, irgendwa sgutes einfallen lassen
+                    try
+                    {
+                        imageSource = doc.DocumentNode.Descendants("img").First().GetAttributeValue("src", string.Empty);
+                        summary = doc.DocumentNode.Descendants("p").First().InnerText;
+                    }
+                    catch (Exception)
+                    {
+                        imageSource = feed.ImageUrl.AbsoluteUri;
+                    }
                     Articles.Add(new ArticleModel
                     {
                         Header = item.Title.Text,
-                        Summary = item.Summary.Text,
+                        Summary = summary,
                         Link = item.Links[0].Uri.AbsoluteUri,
                         Date = item.PublishDate.DateTime,
-                        //Text = "<img src=\"https://media-cdn.sueddeutsche.de/image/sz.1.4865667/208x156\" alt=\"Boateng unterstützt Münchner und Berliner Tafel\" data-portal-copyright=\"dpa\" /><p>Der Spieler sagt, er habe nur seinen kranken Sohn in Berlin besucht. Ajax-Sportdirektor Ove...
-                        ImageSource = temp2
+                        ImageSource = imageSource
                     });
                 }
             };
@@ -129,12 +140,26 @@ namespace Newsticker.ViewModel
                 SyndicationFeed feed = SyndicationFeed.Load(reader);
                 foreach (var item in feed.Items)
                 {
+                    var doc = new HtmlDocument();
+                    doc.LoadHtml(item.Summary.Text);
+                    string imageSource = string.Empty;
+                    string summary = string.Empty;
+                    try
+                    {
+                        imageSource = doc.DocumentNode.Descendants("img").First().GetAttributeValue("src", string.Empty);
+                        summary = doc.DocumentNode.Descendants("p").First().InnerText;
+                    }
+                    catch (Exception)
+                    {
+                        imageSource = feed.ImageUrl.AbsoluteUri;
+                    }
                     Articles.Add(new ArticleModel
                     {
                         Header = item.Title.Text,
-                        Summary = item.Summary.Text,
+                        Summary = summary,
                         Link = item.Id,
-                        Date = item.PublishDate.DateTime
+                        Date = item.PublishDate.DateTime,
+                        ImageSource = imageSource
                     });
                 }
             };
@@ -150,6 +175,7 @@ namespace Newsticker.ViewModel
 
         private void ExecuteTagesschauCommand(object obj)
         {
+            ((MainWindow)Application.Current.MainWindow).TagesschauButton.Background = new SolidColorBrush() { Color = (Color)ColorConverter.ConvertFromString("#FF1E1E1E") };
             using (XmlReader reader = XmlReader.Create("https://www.tagesschau.de/xml/rss2")) // https://rss.sueddeutsche.de/rss/Topthemen
             {
                 Articles.Clear();

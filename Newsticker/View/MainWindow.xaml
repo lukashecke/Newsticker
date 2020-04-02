@@ -13,14 +13,14 @@
         >
     <Window.Resources>
         <SolidColorBrush x:Key="VisualStudioGray" Color="#FF2D2D30"/>
-        <SolidColorBrush x:Key="PaleCyan" Color="#FF00D7D7"/>
+        <SolidColorBrush x:Key="VisualStudioDarkGray" Color="#FF1E1E1E"/>
     </Window.Resources>
     <Grid Background="{StaticResource VisualStudioGray}">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="11*"/>
         </Grid.RowDefinitions>
-        <DockPanel Grid.Row="0" MouseLeftButtonDown="DockPanel_MouseLeftButtonDown" Background="{StaticResource VisualStudioGray}" >
+        <DockPanel Height="39" Grid.Row="0" MouseLeftButtonDown="DockPanel_MouseLeftButtonDown" Background="{StaticResource VisualStudioGray}" >
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="5*"/>
@@ -28,7 +28,7 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0" Orientation="Horizontal" FlowDirection="LeftToRight">
                     <Image Source="/Images/newspaper.png" Margin="5"/>
-                    <Button Command="{Binding TagesschauCommand}" BorderThickness="0" Background="Transparent">
+                    <Button x:Name="TagesschauButton" Command="{Binding TagesschauCommand}" BorderThickness="0" Background="Transparent">
                         <Image Source="/Images/tagesschau.png" Margin="5"/>
                     </Button>
                     <Button Command="{Binding FAZCommand}" BorderThickness="0" Background="Transparent">
@@ -54,7 +54,7 @@
                 </StackPanel>
             </Grid>
         </DockPanel>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Background="{StaticResource VisualStudioDarkGray}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="*"/>
@@ -63,7 +63,7 @@
                 <ItemsControl ItemsSource="{Binding Articles}" >
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid Margin="0,5,0,5">
+                            <Grid Margin="0,5,0,5" MaxHeight="200">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*"/>
                                     <RowDefinition Height="*"/>
@@ -78,7 +78,7 @@
                                        Grid.Column="0" 
                                        Grid.RowSpan="4"
                                        Margin="5"/>
-                                <TextBlock Text="{Binding Date, StringFormat='{}{0:dd.MM.yyyy | hh:mm U\\hr}'}" 
+                                <TextBlock Text="{Binding Date, StringFormat='{}{0:dd.MM.yyyy | HH:mm U\\hr}'}" 
                                            Foreground="White"
                                            Grid.Column="1" Grid.Row="0"/>
                                 <TextBlock Text="{Binding Header}"
