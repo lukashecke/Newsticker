@@ -5,9 +5,11 @@ using Newsticker.View;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.ServiceModel.Syndication;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.UI.HtmlControls;
@@ -62,6 +64,23 @@ namespace Newsticker.ViewModel
             {
                 this.restoreButton = value;
                 this.OnPropertyChanged("RestoreButton");
+            }
+        }
+        private WeatherModel weather;
+        public WeatherModel Weather
+        {
+            get
+            {
+                if (this.weather == null)
+                {
+                    this.weather = new WeatherModel();
+                }
+                return this.weather;
+            }
+            set
+            {
+                this.weather = value;
+                this.OnPropertyChanged("Weather");
             }
         }
 
@@ -164,13 +183,37 @@ namespace Newsticker.ViewModel
                 }
             };
 
+            SyndicationFeed feed2;
             // TODO: Eigenständige Aktualisierung des Wetters
-            using (XmlReader reader = XmlReader.Create("https://www.wetter.com/wetter_rss/wetter.xml"))
+            using (XmlReader reader = XmlReader.Create("https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160007&obs=1&fc=1")) // Munich Weather
             {
-                SyndicationFeed feed = SyndicationFeed.Load(reader);
-                ((MainWindow)Application.Current.MainWindow).WeatherFeed.Text = feed.Items.First().Summary.Text; // Allgemeine Wetterlage
-                //((MainWindow)Application.Current.MainWindow).WeatherFeed.Text = feed.Items.ElementAt(1).Summary.Text; // html?
+                feed2 = SyndicationFeed.Load(reader);
             };
+            HtmlDocument htmlCurrentWeather = new HtmlDocument();
+            htmlCurrentWeather.LoadHtml(feed2.Items.First().Summary.Text);
+            string temperature = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[2].InnerText, "[ \\n]", string.Empty);
+            string feel = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[8].InnerText, "[ \\n]", string.Empty);
+            string dewPoint = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[12].InnerText, "[ \\n]", string.Empty);
+            string relativeHumidity = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[18].InnerText, "[ \\n]", string.Empty);
+            Weather.Temperature = HttpUtility.HtmlDecode(temperature);
+            Weather.Feel = HttpUtility.HtmlDecode(feel);
+            Weather.DewPoint = HttpUtility.HtmlDecode(dewPoint);
+            Weather.RelativeHumidity = HttpUtility.HtmlDecode(relativeHumidity);
+            Weather.UpdateTime = feed2.LastUpdatedTime.LocalDateTime; // Im Notfall das hier, das Beste bis jetzt...
+            //Weather.UpdateTime = Convert.ToDateTime(feed2.LastUpdatedTime.LocalDateTime, new CultureInfo("de-DE", false).DateTimeFormat);
+            HtmlDocument htmlWeatherForecast = new HtmlDocument();
+            htmlWeatherForecast.LoadHtml(feed2.Items.ElementAt(1).Summary.Text);
+            Weather.ImageSource = htmlWeatherForecast.DocumentNode.Descendants("img").First().GetAttributeValue("src", string.Empty);
+            string temperatureRange = HttpUtility.HtmlDecode(Regex.Replace(htmlWeatherForecast.DocumentNode.ChildNodes[8].InnerText, "[ \\n]", string.Empty));
+            Weather.Low = temperatureRange.Split('-')[0];
+            Weather.High = temperatureRange.Split('-')[1];
+            string wind = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[22].InnerText, "[ \\n]", string.Empty);
+            Weather.Wind = HttpUtility.HtmlDecode(wind);
+            // TODO: Check if this gets a value while raining or always nothing
+            string rain = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[28].InnerText, "[ \\n]", string.Empty);
+            Weather.Rain = HttpUtility.HtmlDecode(rain);
+            string pressure = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[32].InnerText, "[ \\n]", string.Empty);
+            Weather.Pressure = HttpUtility.HtmlDecode(pressure);
         }
 
         private void ExecuteTagesschauCommand(object obj)
@@ -182,13 +225,18 @@ namespace Newsticker.ViewModel
                 SyndicationFeed feed = SyndicationFeed.Load(reader);
                 foreach (var item in feed.Items)
                 {
+                    // TODO: Exceptionsicher machen und das auch nicht nur hier!!!!!!!
+                    /*System.NullReferenceException: "Der Objektverweis wurde nicht auf eine Objektinstanz festgelegt."
 
+System.ServiceModel.Syndication.SyndicationFeed.ImageUrl.get hat null zurückgegeben.
+                     */
                     Articles.Add(new ArticleModel
                     {
                         Header = item.Title.Text,
                         Summary = item.Summary.Text,
                         Link = item.Id,
-                        Date = item.PublishDate.DateTime
+                        Date = item.PublishDate.DateTime,
+                        ImageSource = feed.ImageUrl.AbsoluteUri
                     });
                 }
             };

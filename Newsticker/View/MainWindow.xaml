@@ -60,7 +60,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding Articles}" >
+                <ItemsControl ItemsSource="{Binding Articles}" Grid.Column="0">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Grid Margin="0,5,0,5" MaxHeight="200">
@@ -104,9 +104,50 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>
-            <!--<FlowDocumentPageViewer/>-->
-            <TextBox Grid.Column="1" Name="WeatherFeed" TextWrapping="Wrap"/>
-            <!--<WebBrowser Grid.Column="1" Source="http://wetter.com/wetter_rss/wetter.xml"/>-->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Label Content="München, Bayern, DE" FontWeight="Bold" Grid.Row="0" Foreground="White"/>
+                <TextBlock Text="{Binding Weather.UpdateTime, StringFormat='{}{0:Ak\\tuali\\sier\\t: dd.MM.yyyy HH:mm U\\hr}'}" Grid.Row="1" Foreground="White"/>
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Weather.Temperature}" Grid.Column="0" Foreground="White" FontSize="30"/>
+                    <Image Source="{Binding Weather.ImageSource}" Grid.Column="1" MaxHeight="30"/>
+                </Grid>
+                <TextBlock Text="{Binding Weather.Feel,StringFormat='{}Gefühlt: {0}'}" Grid.Row="3" Foreground="White" />
+                <TextBlock Text="{Binding Weather.Low,StringFormat='{}Tiefsttemperatur: {0}'}" Grid.Row="4" Foreground="White" />
+                <TextBlock Text="{Binding Weather.High,StringFormat='{}Höchsttemperatur: {0}'}" Grid.Row="5" Foreground="White" />
+                <TextBlock Text="{Binding Weather.DewPoint,StringFormat='{}Taupunkt: {0}'}" Grid.Row="6" Foreground="White" />
+                <TextBlock Text="{Binding Weather.RelativeHumidity,StringFormat='{}Luftfeuchtigkeit: {0}'}" Grid.Row="7" Foreground="White" />
+                <TextBlock Text="{Binding Weather.Wind,StringFormat='{}Wind: {0}'}" Grid.Row="8" Foreground="White" />
+                <TextBlock Text="{Binding Weather.Rain,StringFormat='{}Niederschlag: {0}'}" Grid.Row="9" Foreground="White" />
+                <TextBlock Text="{Binding Weather.Pressure,StringFormat='{}Luftdruck: {0}'}" Grid.Row="10" Foreground="White" />
+                <Grid Grid.Row="13">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Powered by" Grid.Column="0" Foreground="White" VerticalAlignment="Center"/>
+                    <Image Source="/Images/weatherzone.png" Grid.Column="1" />
+                </Grid>
+            </Grid>
         </Grid>
     </Grid>
 </Window>

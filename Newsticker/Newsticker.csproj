@@ -74,6 +74,8 @@
     </Compile>
     <Compile Include="Commands\RelayCommand.cs" />
     <Compile Include="Models\ArticleModel.cs" />
+    <Compile Include="Models\ModelBase.cs" />
+    <Compile Include="Models\WeatherModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="View\MainWindow.xaml.cs">
@@ -138,6 +140,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\maximize.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\weatherzone.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
