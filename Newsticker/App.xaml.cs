@@ -19,7 +19,7 @@ namespace Newsticker
             try
             {
                 // Einstiegspunkt des Programms
-                Window mainWindow = new MainWindow();
+                Window mainWindow = new MainWindow("preLoad");
                 mainWindow.Show();
             }
             catch (Exception ex)

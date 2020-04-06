@@ -27,6 +27,19 @@ namespace Newsticker.View
             this.DataContext = new MainWindowViewModel();
             InitializeComponent();
         }
+        public MainWindow(string loadingState)
+        {
+            if (loadingState.Equals("preLoad"))
+            {
+                this.DataContext = new MainWindowViewModel(loadingState);
+                InitializeComponent();
+            }
+            else
+            {
+                this.DataContext = new MainWindowViewModel();
+                InitializeComponent();
+            }
+        }
 
         private void DockPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
