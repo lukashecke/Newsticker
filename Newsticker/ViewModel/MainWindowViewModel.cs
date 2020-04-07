@@ -131,11 +131,16 @@ namespace Newsticker.ViewModel
         {
             get
             {
-                if (this.restoreButton == null)
+                if (Application.Current.MainWindow.WindowState == WindowState.Maximized)
+                {
+                    this.restoreButton = "/Images/restore.png";
+                    return this.restoreButton;
+                }
+                else
                 {
                     this.restoreButton = "/Images/maximize.png";
+                    return this.restoreButton;
                 }
-                return this.restoreButton;
             }
             set
             {
@@ -480,14 +485,14 @@ System.ServiceModel.Syndication.SyndicationFeed.ImageUrl.get hat null zurückgeg
                      */
 
                     string imageSource = string.Empty;
-                    if (feed.ImageUrl?.AbsoluteUri == null)
-                    {
-                        imageSource = "/Images/tagesschau.png";
-                    }
-                    else
-                    {
-                        imageSource = feed.ImageUrl.AbsoluteUri;
-                    }
+                    //if (feed.ImageUrl?.AbsoluteUri == null)
+                    //{
+                    //    imageSource = "/Images/tagesschau.png";
+                    //}
+                    //else
+                    //{
+                        imageSource = feed.ImageUrl?.AbsoluteUri;
+                    //}
                     tagesschauArticles.Add(new ArticleModel
                     {
                         Header = item.Title.Text,

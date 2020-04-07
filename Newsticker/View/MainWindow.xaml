@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Newsticker"
         xmlns:controls="clr-namespace:Newsticker.Controls"
-        mc:Ignorable="d"
         Title="Newsticker"
-        Height="450" 
-        Width="800"
-        WindowStartupLocation="CenterScreen"
-        WindowStyle="None">
+        WindowStyle="None" 
+        Height="460"
+        Width="750"
+        ResizeMode="NoResize"
+        WindowState="Maximized">
     <Window.Resources>
         <SolidColorBrush x:Key="VisualStudioGray" Color="#FF2D2D30"/>
         <SolidColorBrush x:Key="VisualStudioDarkGray" Color="#FF1E1E1E"/>
@@ -97,75 +97,78 @@
             </Setter>
         </Style>
     </Window.Resources>
-    <Grid Background="{StaticResource VisualStudioGray}">
+    <Grid Background="DarkGray">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <DockPanel Height="39" Grid.Row="0" MouseLeftButtonDown="DockPanel_MouseLeftButtonDown" Background="{StaticResource VisualStudioGray}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="5*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Orientation="Horizontal" FlowDirection="LeftToRight">
-                    <Button Command="{Binding UpdateCommand}"  Style="{StaticResource MyButton}">
-                        <Image Source="/Images/newspaper.png" Margin="2"/>
-                    </Button>
-                    <ToggleButton x:Name="TagesschauButton" Command="{Binding TagesschauCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding TagesschauChecked}">
-                        <Image Source="/Images/tagesschau.png" Margin="5"/>
-                    </ToggleButton>
-                    <ToggleButton Command="{Binding FAZCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding FAZChecked}">
-                        <Image Source="/Images/faz.png" Margin="5"/>
-                    </ToggleButton>
-                    <ToggleButton Command="{Binding SZCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding SZChecked}">
-                        <Image Source="/Images/sz.png" Margin="5,8,5,5"/>
-                    </ToggleButton>
-                    <ToggleButton Command="{Binding CNNCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding CNNChecked}">
-                        <Image Source="/Images/cnn.png" Margin="5,8,5,5"/>
-                    </ToggleButton>
-                </StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" FlowDirection="RightToLeft">
-                    <Button Command="{Binding CloseCommand}" Background="Transparent" BorderThickness="0" Style="{StaticResource CloseButton}">
-                        <Image Source="/Images/close.png" Margin="12"/>
-                    </Button>
-                    <Button Command="{Binding RestoreCommand}" Style="{StaticResource MyButton}" >
-                        <Image Source="{Binding RestoreButton}" Margin="12"/>
-                    </Button>
-                    <Button Command="{Binding MinimizeCommand}" Style="{StaticResource MyButton}" >
-                        <Image Source="/Images/minimize.png" Margin="12"/>
-                    </Button>
-                </StackPanel>
-            </Grid>
+        <DockPanel MouseLeftButtonDown="DockPanel_MouseLeftButtonDown" Background="{StaticResource VisualStudioGray}" FlowDirection="RightToLeft">
+            <!--FlowDirection RightToLeft so the Buttons can Overlay the Buttons-->
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" MinWidth="145" Background="{StaticResource VisualStudioGray}">
+                <Button Command="{Binding CloseCommand}" Background="Transparent"  BorderThickness="0" Style="{StaticResource CloseButton}">
+                    <Image Source="/Images/close.png" Margin="10"/>
+                </Button>
+                <Button Command="{Binding RestoreCommand}" Style="{StaticResource MyButton}">
+                    <Image Source="{Binding RestoreButton}"  Margin="9"/>
+                </Button>
+                <Button Command="{Binding MinimizeCommand}" Style="{StaticResource MyButton}"  >
+                    <Image Source="/Images/minimize.png" Margin="10"/>
+                </Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight" HorizontalAlignment="Right">
+                <Button Command="{Binding UpdateCommand}"  Style="{StaticResource MyButton}">
+                    <Image Source="/Images/newspaper.png" Margin="2"/>
+                </Button>
+                <ToggleButton x:Name="TagesschauButton" Command="{Binding TagesschauCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding TagesschauChecked}">
+                    <Image Source="/Images/tagesschau.png" Margin="5"/>
+                </ToggleButton>
+                <ToggleButton Command="{Binding FAZCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding FAZChecked}">
+                    <Image Source="/Images/faz.png" Margin="5"/>
+                </ToggleButton>
+                <ToggleButton Command="{Binding SZCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding SZChecked}">
+                    <Image Source="/Images/sz.png" Margin="5,8,5,5"/>
+                </ToggleButton>
+                <ToggleButton Command="{Binding CNNCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding CNNChecked}">
+                    <Image Source="/Images/cnn.png" Margin="5,8,5,5"/>
+                </ToggleButton>
+            </StackPanel>
         </DockPanel>
         <Grid Grid.Row="1" Background="{StaticResource VisualStudioDarkGray}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" MaxWidth="300"/>
             </Grid.ColumnDefinitions>
             <Label Content="Suche dir oben eine Zeitung aus und Los gehts :)" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding WelcomeTextVisibility}"/>
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ScrollViewer VerticalScrollBarVisibility="Visible">
                 <ItemsControl ItemsSource="{Binding Articles}" Grid.Column="0">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid Margin="0,5,0,5" MaxHeight="200">
+                            <Grid Margin="0,5,0,5" Height="130" Width="530">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="2.5*"/>
+                                    <ColumnDefinition Width="Auto" MaxWidth="200"/>
+                                    <ColumnDefinition Width="*" MinWidth="300"/>
                                 </Grid.ColumnDefinitions>
                                 <Image Source="{Binding ImageSource}" 
                                        Grid.Column="0" 
-                                       Grid.RowSpan="4"
-                                       Margin="5"/>
+                                       Grid.RowSpan="5"
+                                       Margin="5"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" MaxHeight="120"/>
                                 <TextBlock Text="{Binding Date, StringFormat='{}{0:dd.MM.yyyy | HH:mm U\\hr}'}" 
                                            Foreground="White"
-                                           Grid.Column="1" Grid.Row="0"/>
+                                           Grid.Column="1" Grid.Row="0" />
                                 <TextBlock Text="{Binding Header}"
                                            Foreground="White"
                                        Grid.Row="1"
@@ -176,7 +179,7 @@
                                            Foreground="White"
                                        Grid.Row="2"
                                        Grid.Column="1"
-                                       TextWrapping="Wrap"/>
+                                       TextWrapping="Wrap" MaxHeight="65"/>
                                 <TextBlock Grid.Row="3" Grid.Column="1">
                                     <Hyperlink NavigateUri="{Binding Link}" RequestNavigate="Hyperlink_RequestNavigate">
                                         <Hyperlink.Inlines>
@@ -191,18 +194,18 @@
             </ScrollViewer>
             <Grid Grid.Column="1" Margin="5,0,0,0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
@@ -229,7 +232,7 @@
                 <Image Source="/Images/weatherzone.png" Grid.Row="13" Grid.Column="1" />
             </Grid>
         </Grid>
-        <Grid Visibility="{Binding LoadingScreenVisibility}" Grid.Row="1" Background="{StaticResource VisualStudioDarkGray}">
+        <!--<Grid Visibility="{Binding LoadingScreenVisibility}" Grid.Row="1" Background="{StaticResource VisualStudioDarkGray}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="375*"/>
                 <ColumnDefinition Width="22*"/>
@@ -242,6 +245,6 @@
                 <controls:SpinnerControl Grid.Row="0" VerticalAlignment="Bottom"/>
                 <Label Content="Aktualisiere Daten..." Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Row="1"/>
             </Grid>
-        </Grid>
+        </Grid>-->
     </Grid>
 </Window>
