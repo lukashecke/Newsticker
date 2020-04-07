@@ -15,7 +15,6 @@
         <SolidColorBrush x:Key="VisualStudioGray" Color="#FF2D2D30"/>
         <SolidColorBrush x:Key="VisualStudioDarkGray" Color="#FF1E1E1E"/>
         <SolidColorBrush x:Key="VisualStudioLightGray" Color="#FF3F3F46"/>
-
         <Style x:Key="DockButton" TargetType="ToggleButton">
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Background" Value="Transparent"/>
@@ -97,7 +96,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
     </Window.Resources>
     <Grid Background="{StaticResource VisualStudioGray}">
         <Grid.RowDefinitions>
@@ -208,32 +206,27 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Label Content="München, Bayern, DE" FontWeight="Bold" Grid.Row="0" Foreground="White"/>
-                <TextBlock Text="{Binding Weather.UpdateTime, StringFormat='{}{0:Ak\\tuali\\sier\\t: dd.MM.yyyy HH:mm U\\hr}'}" Grid.Row="1" Foreground="White"/>
-                <Grid Grid.Row="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding Weather.Temperature}" Grid.Column="0" Foreground="White" FontSize="30"/>
-                    <Image Source="{Binding Weather.ImageSource}" Grid.Column="1" MaxHeight="30"/>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Weather.Location}" FontWeight="Bold" Grid.Row="0" Grid.Column="1" Foreground="White"/>
+                <ComboBox ItemsSource="{Binding WeatherLocationsList}" Grid.Row="0" SelectedItem="{Binding WeatherLocationsList.Current, Mode=TwoWay}" SelectionChanged="ComboBox_SelectionChanged"/>
+                <TextBlock Text="{Binding Weather.UpdateTime, StringFormat='{}{0:Ak\\tuali\\sier\\t: dd.MM.yyyy HH:mm U\\hr}'}" Grid.Row="1" Grid.ColumnSpan="2" Foreground="White"/>
+                <TextBlock Text="{Binding Weather.Temperature}" Grid.Row="2" Grid.Column="0" Foreground="White" FontSize="30"/>
+                <Grid Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" Margin="0,2,10,10">
+                    <Image Source="{Binding Weather.ImageSource}" VerticalAlignment="Stretch" HorizontalAlignment="Left"/>
                 </Grid>
-                <TextBlock Text="{Binding Weather.Feel,StringFormat='{}Gefühlt: {0}'}" Grid.Row="3" Foreground="White" />
-                <TextBlock Text="{Binding Weather.Low,StringFormat='{}Tiefsttemperatur: {0}'}" Grid.Row="4" Foreground="White" />
-                <TextBlock Text="{Binding Weather.High,StringFormat='{}Höchsttemperatur: {0}'}" Grid.Row="5" Foreground="White" />
-                <TextBlock Text="{Binding Weather.DewPoint,StringFormat='{}Taupunkt: {0}'}" Grid.Row="6" Foreground="White" />
-                <TextBlock Text="{Binding Weather.RelativeHumidity,StringFormat='{}Luftfeuchtigkeit: {0}'}" Grid.Row="7" Foreground="White" />
-                <TextBlock Text="{Binding Weather.Wind,StringFormat='{}Wind: {0}'}" Grid.Row="8" Foreground="White" />
-                <TextBlock Text="{Binding Weather.Rain,StringFormat='{}Niederschlag: {0}'}" Grid.Row="9" Foreground="White" />
-                <TextBlock Text="{Binding Weather.Pressure,StringFormat='{}Luftdruck: {0}'}" Grid.Row="10" Foreground="White" />
-                <Grid Grid.Row="13">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="Powered by" Grid.Column="0" Foreground="White" VerticalAlignment="Center"/>
-                    <Image Source="/Images/weatherzone.png" Grid.Column="1" />
-                </Grid>
+                <TextBlock Text="{Binding Weather.Feel,StringFormat='{}Gefühlt: {0}'}" Grid.Row="3" Grid.ColumnSpan="2" Foreground="White" />
+                <TextBlock Text="{Binding Weather.Low,StringFormat='{}Tiefsttemperatur: {0}'}" Grid.Row="4" Grid.ColumnSpan="2" Foreground="White" />
+                <TextBlock Text="{Binding Weather.High,StringFormat='{}Höchsttemperatur: {0}'}" Grid.Row="5" Grid.ColumnSpan="2" Foreground="White" />
+                <TextBlock Text="{Binding Weather.DewPoint,StringFormat='{}Taupunkt: {0}'}" Grid.Row="6" Grid.ColumnSpan="2" Foreground="White" />
+                <TextBlock Text="{Binding Weather.RelativeHumidity,StringFormat='{}Luftfeuchtigkeit: {0}'}" Grid.Row="7" Grid.ColumnSpan="2" Foreground="White" />
+                <TextBlock Text="{Binding Weather.Wind,StringFormat='{}Wind: {0}'}" Grid.Row="8" Grid.ColumnSpan="2" Foreground="White" />
+                <TextBlock Text="{Binding Weather.Rain,StringFormat='{}Niederschlag: {0}'}" Grid.Row="9" Grid.ColumnSpan="2" Foreground="White" />
+                <TextBlock Text="{Binding Weather.Pressure,StringFormat='{}Luftdruck: {0}'}" Grid.Row="10" Grid.ColumnSpan="2" Foreground="White" />
+                <TextBlock Text="Powered by" Grid.Row="13" Grid.Column="0" Foreground="White" VerticalAlignment="Center"/>
+                <Image Source="/Images/weatherzone.png" Grid.Row="13" Grid.Column="1" />
             </Grid>
         </Grid>
         <Grid Visibility="{Binding LoadingScreenVisibility}" Grid.Row="1" Background="{StaticResource VisualStudioDarkGray}">

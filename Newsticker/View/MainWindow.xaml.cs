@@ -51,5 +51,11 @@ namespace Newsticker.View
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;
         }
+
+        // TODO: Das hir muss ins ViewModel und auserdem Backgroundworker-Arbeit und einen Spinner anzeigen
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ((MainWindowViewModel)this.DataContext).LoadWeather(new object());
+        }
     }
 }

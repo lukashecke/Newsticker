@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.ServiceModel.Syndication;
 using System.Text;
@@ -24,6 +25,7 @@ namespace Newsticker.ViewModel
     class MainWindowViewModel : ViewModelBase
     {
         BackgroundWorker backgroundWorker = new BackgroundWorker();
+        Dictionary<string, string> locationRssLookup = new Dictionary<string, string>();
         #region properties
         public ICommand CloseCommand { get; set; }
         public ICommand RestoreCommand { get; set; }
@@ -184,6 +186,24 @@ namespace Newsticker.ViewModel
                 this.OnPropertyChanged("WelcomeTextVisibility");
             }
         }
+        private ObservableCollectionEx<string> weatherLocationsList;
+        public ObservableCollectionEx<string> WeatherLocationsList
+        {
+            get
+            {
+                if (this.weatherLocationsList == null)
+                {
+                    this.weatherLocationsList = new ObservableCollectionEx<string>();
+                }
+                return this.weatherLocationsList;
+            }
+            set
+            {
+                this.weatherLocationsList = value;
+                this.OnPropertyChanged("WeatherLocationsList");
+                LoadWeather(new object());
+            }
+        }
         #endregion 
 
         #region constructors
@@ -197,20 +217,27 @@ namespace Newsticker.ViewModel
             this.SZCommand = new RelayCommand(ExecuteSZCommand, CanExecuteSZ);
             this.CNNCommand = new RelayCommand(ExecuteCNNCommand, CanExecuteCNN);
             this.UpdateCommand = new RelayCommand(ExecuteUpdateCommand, CanExecuteUpdate);
+
+            //WeatherLocationsList.Add("");
+            //locationRssLookup.Add("", "");
+            WeatherLocationsList.Add("München");
+            locationRssLookup.Add("München", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160007&obs=1&fc=1");
+            WeatherLocationsList.Add("London");
+            locationRssLookup.Add("London", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160127&obs=1&fc=1");
+            WeatherLocationsList.Add("Washington DC");
+            locationRssLookup.Add("Washington DC", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160136&obs=1&fc=1");
+            WeatherLocationsList.Add("Wrocław");
+            locationRssLookup.Add("Wrocław", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160911&obs=1&fc=1");
+            WeatherLocationsList.Add("Warszawa");
+            locationRssLookup.Add("Warszawa", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160277&obs=1&fc=1");
+            WeatherLocationsList.Add("Beijing");
+            locationRssLookup.Add("Beijing", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160059&obs=1&fc=1");
+
         }
-        public MainWindowViewModel(string loadingState)
+        public MainWindowViewModel(string loadingState) : this()
         {
             if (loadingState.Equals("preLoad"))
             {
-                this.CloseCommand = new RelayCommand(ExecuteCloseCommand, CanExecuteClose);
-                this.RestoreCommand = new RelayCommand(ExecuteRestoreCommand, CanExecuteRestore);
-                this.MinimizeCommand = new RelayCommand(ExecuteMinimizeCommand, CanExecuteMinimize);
-                this.TagesschauCommand = new RelayCommand(ExecuteTagesschauCommand, CanExecuteTagesschau);
-                this.FAZCommand = new RelayCommand(ExecuteFAZCommand, CanExecuteFAZ);
-                this.SZCommand = new RelayCommand(ExecuteSZCommand, CanExecuteSZ);
-                this.CNNCommand = new RelayCommand(ExecuteCNNCommand, CanExecuteCNN);
-                this.UpdateCommand = new RelayCommand(ExecuteUpdateCommand, CanExecuteUpdate);
-
                 LoadAllComponents();
             }
         }
@@ -480,10 +507,11 @@ System.ServiceModel.Syndication.SyndicationFeed.ImageUrl.get hat null zurückgeg
                 Cache["Tagesschau"] = tagesschauArticles;
             }
         }
-        private void LoadWeather(object obj)
+        public void LoadWeather(object obj)
         {
+            // TODO: Weathericons from here https://www.flaticon.com/packs/weather-19
             SyndicationFeed feed2;
-            using (XmlReader reader = XmlReader.Create("https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160007&obs=1&fc=1")) // Munich Weather
+            using (XmlReader reader = XmlReader.Create(locationRssLookup[WeatherLocationsList.Current]))
             {
                 feed2 = SyndicationFeed.Load(reader);
             };
@@ -497,11 +525,23 @@ System.ServiceModel.Syndication.SyndicationFeed.ImageUrl.get hat null zurückgeg
             Weather.Feel = HttpUtility.HtmlDecode(feel);
             Weather.DewPoint = HttpUtility.HtmlDecode(dewPoint);
             Weather.RelativeHumidity = HttpUtility.HtmlDecode(relativeHumidity);
-            Weather.UpdateTime = feed2.LastUpdatedTime.LocalDateTime; // Im Notfall das hier, das Beste bis jetzt...
-            //Weather.UpdateTime = Convert.ToDateTime(feed2.LastUpdatedTime.LocalDateTime, new CultureInfo("de-DE", false).DateTimeFormat);
+            Weather.UpdateTime = feed2.LastUpdatedTime.LocalDateTime;
+            Weather.Location = feed2.Items.ElementAt(1).Title.Text.Split(' ').First();
             HtmlDocument htmlWeatherForecast = new HtmlDocument();
             htmlWeatherForecast.LoadHtml(feed2.Items.ElementAt(1).Summary.Text);
-            Weather.ImageSource = htmlWeatherForecast.DocumentNode.Descendants("img").First().GetAttributeValue("src", string.Empty);
+            // ImageSource
+            string weatherConditionAsGif = htmlWeatherForecast.DocumentNode.Descendants("img").First().GetAttributeValue("src", string.Empty).Split('/').Last(); // e.g. sunny.gif
+            string imageSource = "/Images/Weather/" + Path.GetFileNameWithoutExtension(weatherConditionAsGif) + ".png";
+            Weather.ImageSource = imageSource;
+            //if ()
+            //{
+            //    Weather.ImageSource = imageSource;
+            //}
+            //else
+            //{
+            //    Weather.ImageSource = htmlWeatherForecast.DocumentNode.Descendants("img").First().GetAttributeValue("src", string.Empty);
+            //}
+
             string temperatureRange = HttpUtility.HtmlDecode(Regex.Replace(htmlWeatherForecast.DocumentNode.ChildNodes[8].InnerText, "[ \\n]", string.Empty));
             Weather.Low = temperatureRange.Split('-')[0];
             Weather.High = temperatureRange.Split('-')[1];

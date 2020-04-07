@@ -82,6 +82,7 @@
     </Compile>
     <Compile Include="Models\ArticleModel.cs" />
     <Compile Include="Models\ModelBase.cs" />
+    <Compile Include="Models\ObservableCollectionEx.cs" />
     <Compile Include="Models\WeatherModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
@@ -150,6 +151,37 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\weatherzone.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Weather\sunny.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Weather\mostly_cloudy.png" />
+    <Resource Include="Images\Weather\showers.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Weather\cloudy2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Weather\windy.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Weather\thunderstorms.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Weather\drizzle.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Weather\mostly_sunny.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Weather\rain.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Weather\cloudy.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Weather\snow.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

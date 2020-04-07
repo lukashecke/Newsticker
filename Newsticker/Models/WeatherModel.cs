@@ -8,6 +8,19 @@ namespace Newsticker.Models
 {
     class WeatherModel : ModelBase
     {
+        private string location;
+        public string Location
+        {
+            get { return location; }
+            set
+            {
+                if (location != value)
+                {
+                    location = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
         private string temperature;
         public string Temperature
         {
