@@ -183,5 +183,14 @@
   <ItemGroup>
     <Resource Include="Images\Weather\snow.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Weather\increasing_sunshine.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\zeit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\nzz.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

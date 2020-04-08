@@ -104,7 +104,7 @@
         </Grid.RowDefinitions>
         <DockPanel MouseLeftButtonDown="DockPanel_MouseLeftButtonDown" Background="{StaticResource VisualStudioGray}" FlowDirection="RightToLeft">
             <!--FlowDirection RightToLeft so the Buttons can Overlay the Buttons-->
-            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" MinWidth="145" Background="{StaticResource VisualStudioGray}">
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" MinWidth="152" Background="{StaticResource VisualStudioGray}">
                 <Button Command="{Binding CloseCommand}" Background="Transparent"  BorderThickness="0" Style="{StaticResource CloseButton}">
                     <Image Source="/Images/close.png" Margin="10"/>
                 </Button>
@@ -119,17 +119,23 @@
                 <Button Command="{Binding UpdateCommand}"  Style="{StaticResource MyButton}">
                     <Image Source="/Images/newspaper.png" Margin="2"/>
                 </Button>
-                <ToggleButton x:Name="TagesschauButton" Command="{Binding TagesschauCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding TagesschauChecked}">
-                    <Image Source="/Images/tagesschau.png" Margin="5"/>
+                <ToggleButton Command="{Binding ZeitCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding ZeitChecked}">
+                    <Image Source="/Images/zeit.png" Margin="5,8,5,6"/>
                 </ToggleButton>
                 <ToggleButton Command="{Binding FAZCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding FAZChecked}">
-                    <Image Source="/Images/faz.png" Margin="5"/>
+                    <Image Source="/Images/faz.png" Margin="5,7,5,2"/>
                 </ToggleButton>
                 <ToggleButton Command="{Binding SZCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding SZChecked}">
-                    <Image Source="/Images/sz.png" Margin="5,8,5,5"/>
+                    <Image Source="/Images/sz.png" Margin="5,10,5,3"/>
+                </ToggleButton>
+                <ToggleButton Command="{Binding NZZCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding NZZChecked}">
+                    <Image Source="/Images/nzz.png" Margin="5,10,5,3"/>
+                </ToggleButton>
+                <ToggleButton Command="{Binding TagesschauCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding TagesschauChecked}">
+                    <Image Source="/Images/tagesschau.png" Margin="5,9,5,3"/>
                 </ToggleButton>
                 <ToggleButton Command="{Binding CNNCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding CNNChecked}">
-                    <Image Source="/Images/cnn.png" Margin="5,8,5,5"/>
+                    <Image Source="/Images/cnn.png" Margin="5,9,5,8"/>
                 </ToggleButton>
             </StackPanel>
         </DockPanel>
@@ -148,14 +154,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid Margin="0,5,0,5" Height="130" Width="530">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
+                            <Grid Margin="0,5,0,5" Height="130" Width="530" Grid.RowSpan="2">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" MaxWidth="200"/>
                                     <ColumnDefinition Width="*" MinWidth="300"/>
@@ -166,27 +165,56 @@
                                        Margin="5"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center" MaxHeight="120"/>
-                                <TextBlock Text="{Binding Date, StringFormat='{}{0:dd.MM.yyyy | HH:mm U\\hr}'}" 
+                                <Grid Grid.Column="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" MaxHeight="112"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Column="1">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Text="{Binding Date, StringFormat='{}{0:dd.MM.yyyy | HH:mm U\\hr}'}" 
                                            Foreground="White"
                                            Grid.Column="1" Grid.Row="0" />
-                                <TextBlock Text="{Binding Header}"
+                                        <TextBlock Text="{Binding Header}"
                                            Foreground="White"
                                        Grid.Row="1"
                                        Grid.Column="1"
                                        TextWrapping="Wrap"
                                        FontWeight="Bold"/>
-                                <TextBlock Text="{Binding Summary}" 
+                                        <TextBlock VerticalAlignment="Top"
                                            Foreground="White"
                                        Grid.Row="2"
                                        Grid.Column="1"
-                                       TextWrapping="Wrap" MaxHeight="65"/>
-                                <TextBlock Grid.Row="3" Grid.Column="1">
+                                       TextWrapping="Wrap" MaxHeight="65">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Text" Value="{Binding Summary}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Summary}" Value="{x:Null}">
+                                                            <Setter Property="Text" Value="Dieser Artikel bietet leider keine Vorschau."/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+
+                                    </Grid>
+                                    <TextBlock Grid.Row="1" VerticalAlignment="Top">
                                     <Hyperlink NavigateUri="{Binding Link}" RequestNavigate="Hyperlink_RequestNavigate">
                                         <Hyperlink.Inlines>
                                             <Run Text="Zum Artikel"/>
                                         </Hyperlink.Inlines>
-                                </Hyperlink>
-                                </TextBlock>
+                                     </Hyperlink>
+                                    </TextBlock>
+                                </Grid>
+
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -196,7 +224,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" MaxHeight="70"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -207,32 +235,40 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="{Binding Weather.Location}" FontWeight="Bold" Grid.Row="0" Grid.Column="1" Foreground="White"/>
                 <ComboBox ItemsSource="{Binding WeatherLocationsList}" Grid.Row="0" SelectedItem="{Binding WeatherLocationsList.Current, Mode=TwoWay}" SelectionChanged="ComboBox_SelectionChanged"/>
                 <TextBlock Text="{Binding Weather.UpdateTime, StringFormat='{}{0:Ak\\tuali\\sier\\t: dd.MM.yyyy HH:mm U\\hr}'}" Grid.Row="1" Grid.ColumnSpan="2" Foreground="White"/>
                 <TextBlock Text="{Binding Weather.Temperature}" Grid.Row="2" Grid.Column="0" Foreground="White" FontSize="30"/>
-                <Grid Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" Margin="0,2,10,10">
-                    <Image Source="{Binding Weather.ImageSource}" VerticalAlignment="Stretch" HorizontalAlignment="Left"/>
+                <Grid Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" Margin="0,2,10,10" VerticalAlignment="Top">
+                    <Image Source="{Binding Weather.ImageSource}" VerticalAlignment="Stretch" HorizontalAlignment="Left" Height="55" Margin="10,5,0,0"/>
                 </Grid>
-                <TextBlock Text="{Binding Weather.Feel,StringFormat='{}Gefühlt: {0}'}" Grid.Row="3" Grid.ColumnSpan="2" Foreground="White" />
-                <TextBlock Text="{Binding Weather.Low,StringFormat='{}Tiefsttemperatur: {0}'}" Grid.Row="4" Grid.ColumnSpan="2" Foreground="White" />
-                <TextBlock Text="{Binding Weather.High,StringFormat='{}Höchsttemperatur: {0}'}" Grid.Row="5" Grid.ColumnSpan="2" Foreground="White" />
-                <TextBlock Text="{Binding Weather.DewPoint,StringFormat='{}Taupunkt: {0}'}" Grid.Row="6" Grid.ColumnSpan="2" Foreground="White" />
-                <TextBlock Text="{Binding Weather.RelativeHumidity,StringFormat='{}Luftfeuchtigkeit: {0}'}" Grid.Row="7" Grid.ColumnSpan="2" Foreground="White" />
-                <TextBlock Text="{Binding Weather.Wind,StringFormat='{}Wind: {0}'}" Grid.Row="8" Grid.ColumnSpan="2" Foreground="White" />
-                <TextBlock Text="{Binding Weather.Rain,StringFormat='{}Niederschlag: {0}'}" Grid.Row="9" Grid.ColumnSpan="2" Foreground="White" />
-                <TextBlock Text="{Binding Weather.Pressure,StringFormat='{}Luftdruck: {0}'}" Grid.Row="10" Grid.ColumnSpan="2" Foreground="White" />
-                <TextBlock Text="Powered by" Grid.Row="13" Grid.Column="0" Foreground="White" VerticalAlignment="Center"/>
-                <Image Source="/Images/weatherzone.png" Grid.Row="13" Grid.Column="1" />
+                <TextBlock Text="" Grid.Row="4"/>
+                <!--Leerzeile-->
+                <TextBlock Text="{Binding Weather.Feel,StringFormat='{}Gefühlt: {0}'}" Grid.Row="3" Grid.ColumnSpan="2" Foreground="White" VerticalAlignment="Top"/>
+                <TextBlock Text="{Binding Weather.Low,StringFormat='{}Tiefsttemperatur: {0}'}" Grid.Row="5" Grid.ColumnSpan="2" Foreground="White" />
+                <TextBlock Text="{Binding Weather.High,StringFormat='{}Höchsttemperatur: {0}'}" Grid.Row="6" Grid.ColumnSpan="2" Foreground="White" />
+                <TextBlock Text="{Binding Weather.DewPoint,StringFormat='{}Taupunkt: {0}'}" Grid.Row="7" Grid.ColumnSpan="2" Foreground="White" />
+                <TextBlock Text="{Binding Weather.RelativeHumidity,StringFormat='{}Luftfeuchtigkeit: {0}'}" Grid.Row="8" Grid.ColumnSpan="2" Foreground="White" />
+                <TextBlock Text="{Binding Weather.Wind,StringFormat='{}Wind: {0}'}" Grid.Row="9" Grid.ColumnSpan="2" Foreground="White" />
+                <TextBlock Text="{Binding Weather.Rain,StringFormat='{}Niederschlag: {0}'}" Grid.Row="10" Grid.ColumnSpan="2" Foreground="White" />
+                <TextBlock Text="{Binding Weather.Pressure,StringFormat='{}Luftdruck: {0}'}" Grid.Row="11" Grid.ColumnSpan="2" Foreground="White" />
+                <Grid  Grid.Row="13" Grid.ColumnSpan="2" HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Powered by" Grid.Column="0" Foreground="White" VerticalAlignment="Center"/>
+                    <Image Source="/Images/weatherzone.png"  Grid.Column="1" MaxHeight="24"/>
+                </Grid>
             </Grid>
         </Grid>
-        <!--<Grid Visibility="{Binding LoadingScreenVisibility}" Grid.Row="1" Background="{StaticResource VisualStudioDarkGray}">
+        <Grid Visibility="{Binding LoadingScreenVisibility}" Grid.Row="1" Background="{StaticResource VisualStudioDarkGray}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="375*"/>
                 <ColumnDefinition Width="22*"/>
@@ -245,6 +281,6 @@
                 <controls:SpinnerControl Grid.Row="0" VerticalAlignment="Bottom"/>
                 <Label Content="Aktualisiere Daten..." Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Row="1"/>
             </Grid>
-        </Grid>-->
+        </Grid>
     </Grid>
 </Window>
