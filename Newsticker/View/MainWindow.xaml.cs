@@ -22,23 +22,20 @@ namespace Newsticker.View
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        public MainWindow(string loadingState = "None")
         {
-            this.DataContext = new MainWindowViewModel();
-            InitializeComponent();
-        }
-        public MainWindow(string loadingState)
-        {
-            if (loadingState.Equals("preLoad"))
+            if (loadingState.Equals("None"))
+            {
+                this.DataContext = new MainWindowViewModel(loadingState);
+                InitializeComponent();
+                ((MainWindowViewModel)this.DataContext).LoadAllComponents();
+            }
+            else
             {
                 this.DataContext = new MainWindowViewModel(loadingState);
                 InitializeComponent();
             }
-            else
-            {
-                this.DataContext = new MainWindowViewModel();
-                InitializeComponent();
-            }
+
         }
 
         private void DockPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

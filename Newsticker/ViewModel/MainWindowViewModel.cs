@@ -242,7 +242,7 @@ namespace Newsticker.ViewModel
         #endregion 
 
         #region constructors
-        public MainWindowViewModel()
+        public MainWindowViewModel(string loadingState)
         {
             this.CloseCommand = new RelayCommand(ExecuteCloseCommand, CanExecuteClose);
             this.RestoreCommand = new RelayCommand(ExecuteRestoreCommand, CanExecuteRestore);
@@ -269,12 +269,11 @@ namespace Newsticker.ViewModel
             locationRssLookup.Add("Warszawa", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160277&obs=1&fc=1");
             WeatherLocationsList.Add("Beijing");
             locationRssLookup.Add("Beijing", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160059&obs=1&fc=1");
-        }
-        public MainWindowViewModel(string loadingState) : this()
-        {
+
             if (loadingState.Equals("preLoad"))
             {
                 LoadAllComponents();
+                LoadingScreenVisibility = "Hidden"; // Wird fälschlicherweise noch kurz angezeigt, obwohl schon geladen im Pre-Load-Aufruf
             }
         }
         #endregion
@@ -392,7 +391,7 @@ namespace Newsticker.ViewModel
         #endregion
 
         #region loading Components
-        private void LoadAllComponents()
+        public void LoadAllComponents()
         {
             LoadingScreenVisibility = "Visible";
             backgroundWorker.DoWork += new DoWorkEventHandler(backgroundWorker_LoadAllComponents);
@@ -765,6 +764,9 @@ System.ServiceModel.Syndication.SyndicationFeed.ImageUrl.get hat null zurückgeg
         }
         #endregion
     }
+    /// <summary>
+    /// Workaround-class to read in xml-files Syndicationfeed-valid DateTime objects
+    /// </summary>
     class MyXmlReader : XmlTextReader
     {
         private bool readingDate = false;

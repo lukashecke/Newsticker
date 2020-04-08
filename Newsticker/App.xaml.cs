@@ -1,4 +1,5 @@
 ﻿using Newsticker.View;
+using Newsticker.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -18,7 +19,6 @@ namespace Newsticker
         {
             try
             {
-                // Einstiegspunkt des Programms
                 Window mainWindow = new MainWindow("preLoad");
                 mainWindow.Show();
             }
