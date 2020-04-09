@@ -73,32 +73,34 @@ namespace Newsticker.Models
                 }
             }
         }
-        private string wind;
-        public string Wind
-        {
-            get { return wind; }
-            set
-            {
-                if (wind != value)
-                {
-                    wind = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-        private string rain;
-        public string Rain
-        {
-            get { return rain; }
-            set
-            {
-                if (rain != value)
-                {
-                    rain = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
+        // I don't need/ want this
+        //private string wind;
+        //public string Wind
+        //{
+        //    get { return wind; }
+        //    set
+        //    {
+        //        if (wind != value)
+        //        {
+        //            wind = value;
+        //            this.OnPropertyChanged();
+        //        }
+        //    }
+        //}
+        // WeatherZone doesn't offer this information through their RSS-Feed
+        //private string rain;
+        //public string Rain
+        //{
+        //    get { return rain; }
+        //    set
+        //    {
+        //        if (rain != value)
+        //        {
+        //            rain = value;
+        //            this.OnPropertyChanged();
+        //        }
+        //    }
+        //}
         private string pressure;
         public string Pressure
         {
@@ -107,7 +109,14 @@ namespace Newsticker.Models
             {
                 if (pressure != value)
                 {
-                    pressure = value;
+                    if (value.Equals("hPa"))
+                    {
+                        pressure = "Keine Informationen verfügbar";
+                    }
+                    else
+                    {
+                        pressure = value;
+                    }
                     this.OnPropertyChanged();
                 }
             }
@@ -173,6 +182,97 @@ namespace Newsticker.Models
                 if (low != value)
                 {
                     low = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+        private string weekDay;
+        public string WeekDay
+        {
+            get { return weekDay; }
+            set
+            {
+                if (weekDay != value)
+                {
+                    weekDay = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+        private string nextWeekDay;
+        public string NextWeekDay
+        {
+            get { return nextWeekDay; }
+            set
+            {
+                if (nextWeekDay != value)
+                {
+                    nextWeekDay = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+        private string overNextWeekDay;
+        public string OverNextWeekDay
+        {
+            get { return overNextWeekDay; }
+            set
+            {
+                if (overNextWeekDay != value)
+                {
+                    overNextWeekDay = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+        private string nextDayInfo;
+        public string NextDayInfo
+        {
+            get { return nextDayInfo; }
+            set
+            {
+                if (nextDayInfo != value)
+                {
+                    nextDayInfo = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+        private string nextDayImageSource;
+        public string NextDayImageSource
+        {
+            get { return nextDayImageSource; }
+            set
+            {
+                if (nextDayImageSource != value)
+                {
+                    nextDayImageSource = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+        private string overNextDayInfo;
+        public string OverNextDayInfo
+        {
+            get { return overNextDayInfo; }
+            set
+            {
+                if (overNextDayInfo != value)
+                {
+                    overNextDayInfo = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+        private string overNextDayImageSource;
+        public string OverNextDayImageSource
+        {
+            get { return overNextDayImageSource; }
+            set
+            {
+                if (overNextDayImageSource != value)
+                {
+                    overNextDayImageSource = value;
                     this.OnPropertyChanged();
                 }
             }

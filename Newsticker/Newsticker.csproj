@@ -68,6 +68,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\SpinnerControl2.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="View\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -79,6 +83,9 @@
     <Compile Include="Commands\RelayCommand.cs" />
     <Compile Include="Controls\SpinnerControl.xaml.cs">
       <DependentUpon>SpinnerControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SpinnerControl2.xaml.cs">
+      <DependentUpon>SpinnerControl2.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\ArticleModel.cs" />
     <Compile Include="Models\ModelBase.cs" />
@@ -191,6 +198,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\nzz.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Weather\cloud_increasing.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\splashScreen.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

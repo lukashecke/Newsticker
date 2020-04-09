@@ -19,6 +19,8 @@ namespace Newsticker
         {
             try
             {
+                SplashScreen splashScreen = new SplashScreen("Images/splashScreen.png");
+                splashScreen.Show(true,true);
                 Window mainWindow = new MainWindow("preLoad");
                 mainWindow.Show();
             }

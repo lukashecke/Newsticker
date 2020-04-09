@@ -49,7 +49,7 @@ namespace Newsticker.View
             e.Handled = true;
         }
 
-        // TODO: Das hir muss ins ViewModel und auserdem Backgroundworker-Arbeit und einen Spinner anzeigen
+        // TODO: Irgendwie ins ViewModel
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ((MainWindowViewModel)this.DataContext).LoadWeather(new object());

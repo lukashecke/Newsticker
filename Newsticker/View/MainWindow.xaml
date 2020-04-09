@@ -144,7 +144,7 @@
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="*" MaxWidth="300"/>
             </Grid.ColumnDefinitions>
-            <Label Content="Suche dir oben eine Zeitung aus und Los gehts :)" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding WelcomeTextVisibility}"/>
+            <Label Content="Such dir eine Zeitung aus und Los gehts :)" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding WelcomeTextVisibility}"/>
             <ScrollViewer VerticalScrollBarVisibility="Visible">
                 <ItemsControl ItemsSource="{Binding Articles}" Grid.Column="0">
                     <ItemsControl.ItemsPanel>
@@ -233,6 +233,11 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
@@ -243,6 +248,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="{Binding Weather.Location}" FontWeight="Bold" Grid.Row="0" Grid.Column="1" Foreground="White"/>
                 <ComboBox ItemsSource="{Binding WeatherLocationsList}" Grid.Row="0" SelectedItem="{Binding WeatherLocationsList.Current, Mode=TwoWay}" SelectionChanged="ComboBox_SelectionChanged"/>
+                
                 <TextBlock Text="{Binding Weather.UpdateTime, StringFormat='{}{0:Ak\\tuali\\sier\\t: dd.MM.yyyy HH:mm U\\hr}'}" Grid.Row="1" Grid.ColumnSpan="2" Foreground="White"/>
                 <TextBlock Text="{Binding Weather.Temperature}" Grid.Row="2" Grid.Column="0" Foreground="White" FontSize="30"/>
                 <Grid Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" Margin="0,2,10,10" VerticalAlignment="Top">
@@ -255,10 +261,12 @@
                 <TextBlock Text="{Binding Weather.High,StringFormat='{}Höchsttemperatur: {0}'}" Grid.Row="6" Grid.ColumnSpan="2" Foreground="White" />
                 <TextBlock Text="{Binding Weather.DewPoint,StringFormat='{}Taupunkt: {0}'}" Grid.Row="7" Grid.ColumnSpan="2" Foreground="White" />
                 <TextBlock Text="{Binding Weather.RelativeHumidity,StringFormat='{}Luftfeuchtigkeit: {0}'}" Grid.Row="8" Grid.ColumnSpan="2" Foreground="White" />
-                <TextBlock Text="{Binding Weather.Wind,StringFormat='{}Wind: {0}'}" Grid.Row="9" Grid.ColumnSpan="2" Foreground="White" />
-                <TextBlock Text="{Binding Weather.Rain,StringFormat='{}Niederschlag: {0}'}" Grid.Row="10" Grid.ColumnSpan="2" Foreground="White" />
                 <TextBlock Text="{Binding Weather.Pressure,StringFormat='{}Luftdruck: {0}'}" Grid.Row="11" Grid.ColumnSpan="2" Foreground="White" />
-                <Grid  Grid.Row="13" Grid.ColumnSpan="2" HorizontalAlignment="Center">
+                <TextBlock Text="{Binding Weather.NextWeekDay}" Grid.Row="12" Grid.Column="0" Foreground="White"/>
+                <TextBlock Text="Wetter" Grid.Row="13"/>
+                <TextBlock Text="{Binding Weather.OverNextWeekDay}" Grid.Row="14" Grid.Column="0" Foreground="White"/>
+                <TextBlock  Text="Wetter" Grid.Row="15"/>
+                <Grid  Grid.Row="18" Grid.ColumnSpan="2" HorizontalAlignment="Center">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
@@ -266,13 +274,14 @@
                     <TextBlock Text="Powered by" Grid.Column="0" Foreground="White" VerticalAlignment="Center"/>
                     <Image Source="/Images/weatherzone.png"  Grid.Column="1" MaxHeight="24"/>
                 </Grid>
+                <Grid Visibility="{Binding WeatherSpinnerVisibility}" Grid.Row="1" Grid.RowSpan="17" Grid.ColumnSpan="2" Background="{StaticResource VisualStudioDarkGray}">
+                    <controls:SpinnerControl2 VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Grid>
             </Grid>
         </Grid>
-        <Grid Visibility="{Binding LoadingScreenVisibility}" Grid.Row="1" Background="{StaticResource VisualStudioDarkGray}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="375*"/>
-                <ColumnDefinition Width="22*"/>
-            </Grid.ColumnDefinitions>
+        <Grid Visibility="{Binding LoadingScreenVisibility}" 
+              Grid.Row="1" 
+              Background="{StaticResource VisualStudioDarkGray}">
             <Grid Grid.ColumnSpan="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>

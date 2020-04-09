@@ -26,9 +26,12 @@ namespace Newsticker.ViewModel
 {
     class MainWindowViewModel : ViewModelBase
     {
-        BackgroundWorker backgroundWorker = new BackgroundWorker();
-        Dictionary<string, string> locationRssLookup = new Dictionary<string, string>();
+
         #region properties
+        private bool WeatherIsLoading { get; set; }
+        private BackgroundWorker WeatherBackgroundWorker { get; set; }
+        private BackgroundWorker BackgroundWorker { get; set; }
+        public Dictionary<string, string> LocationRssLookup { get; set; }
         public ICommand CloseCommand { get; set; }
         public ICommand RestoreCommand { get; set; }
         public ICommand MinimizeCommand { get; set; }
@@ -208,6 +211,19 @@ namespace Newsticker.ViewModel
                 this.OnPropertyChanged("LoadingScreenVisibility");
             }
         }
+        private string weatherSpinnerVisibility = "Hidden";
+        public string WeatherSpinnerVisibility
+        {
+            get
+            {
+                return this.weatherSpinnerVisibility;
+            }
+            set
+            {
+                this.weatherSpinnerVisibility = value;
+                this.OnPropertyChanged("WeatherSpinnerVisibility");
+            }
+        }
         private string welcomeTextVisibility = "Visible";
         public string WelcomeTextVisibility
         {
@@ -257,22 +273,24 @@ namespace Newsticker.ViewModel
 
             //WeatherLocationsList.Add("");
             //locationRssLookup.Add("", "");
+            LocationRssLookup = new Dictionary<string, string>();
             WeatherLocationsList.Add("München");
-            locationRssLookup.Add("München", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160007&obs=1&fc=1");
+            LocationRssLookup.Add("München", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160007&obs=1&fc=1");
             WeatherLocationsList.Add("London");
-            locationRssLookup.Add("London", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160127&obs=1&fc=1");
+            LocationRssLookup.Add("London", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160127&obs=1&fc=1");
             WeatherLocationsList.Add("Washington DC");
-            locationRssLookup.Add("Washington DC", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160136&obs=1&fc=1");
+            LocationRssLookup.Add("Washington DC", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160136&obs=1&fc=1");
             WeatherLocationsList.Add("Wrocław");
-            locationRssLookup.Add("Wrocław", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160911&obs=1&fc=1");
+            LocationRssLookup.Add("Wrocław", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160911&obs=1&fc=1");
             WeatherLocationsList.Add("Warszawa");
-            locationRssLookup.Add("Warszawa", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160277&obs=1&fc=1");
+            LocationRssLookup.Add("Warszawa", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160277&obs=1&fc=1");
             WeatherLocationsList.Add("Beijing");
-            locationRssLookup.Add("Beijing", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160059&obs=1&fc=1");
+            LocationRssLookup.Add("Beijing", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160059&obs=1&fc=1");
 
             if (loadingState.Equals("preLoad"))
             {
                 LoadAllComponents();
+                WaitForWeatherBackgroundWorker();
                 LoadingScreenVisibility = "Hidden"; // Wird fälschlicherweise noch kurz angezeigt, obwohl schon geladen im Pre-Load-Aufruf
             }
         }
@@ -394,25 +412,29 @@ namespace Newsticker.ViewModel
         public void LoadAllComponents()
         {
             LoadingScreenVisibility = "Visible";
-            backgroundWorker.DoWork += new DoWorkEventHandler(backgroundWorker_LoadAllComponents);
-            backgroundWorker.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker_ProgressChanged);
-            backgroundWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_RunWorkerCompleted);
-            backgroundWorker.WorkerReportsProgress = true;
-            backgroundWorker.RunWorkerAsync();
+            BackgroundWorker = new BackgroundWorker();
+            BackgroundWorker.DoWork += new DoWorkEventHandler(BackgroundWorker_LoadAllComponents);
+            BackgroundWorker.ProgressChanged += new ProgressChangedEventHandler(BackgroundWorker_ProgressChanged);
+            BackgroundWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(BackgroundWorker_RunWorkerCompleted);
+            BackgroundWorker.WorkerReportsProgress = true;
+            WeatherIsLoading = true;
+            BackgroundWorker.RunWorkerAsync();
         }
 
-        private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            BackgroundWorker.Dispose();
             LoadingScreenVisibility = "Hidden";
         }
 
-        private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             //throw new NotImplementedException();
         }
 
-        private void backgroundWorker_LoadAllComponents(object sender, DoWorkEventArgs e)
+        private void BackgroundWorker_LoadAllComponents(object sender, DoWorkEventArgs e)
         {
+            
             LoadWeather(new object());
             LoadCNN(new object());
             LoadSZ(new object());
@@ -422,8 +444,21 @@ namespace Newsticker.ViewModel
             LoadNZZ(new object());
         }
 
-        private void LoadNZZ(object v)
+        private void WaitForWeatherBackgroundWorker()
         {
+            while (WeatherIsLoading)
+            {
+                // Wait for it
+            }
+        }
+
+        private void LoadNZZ(object obj)
+        {
+            if (obj is null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
             ObservableCollection<ArticleModel> nZZArticles = new ObservableCollection<ArticleModel>();
 
             SyndicationFeed feed = new SyndicationFeed();
@@ -455,7 +490,7 @@ namespace Newsticker.ViewModel
                     Header = item.Title.Text,
                     Summary = item.Summary?.Text,
                     Link = item.Id,
-                    Date = item.PublishDate.DateTime.ToLocalTime(), // TODO: Überall PublishDate.LocalDateTime einfach nehmen anstatt manuell zui verändern :)
+                    Date = item.PublishDate.DateTime.ToLocalTime(),
                     ImageSource = imageSource
                 });
                 i++;
@@ -470,8 +505,13 @@ namespace Newsticker.ViewModel
                 Cache["NZZ"] = nZZArticles;
             }
         }
-        private void LoadZeit(object v)
+        private void LoadZeit(object obj)
         {
+            if (obj is null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
             ObservableCollection<ArticleModel> zeitArticles = new ObservableCollection<ArticleModel>();
 
             using (XmlReader reader = XmlReader.Create("http://newsfeed.zeit.de/"))
@@ -485,8 +525,8 @@ namespace Newsticker.ViewModel
                 {
                     var doc = new HtmlDocument();
                     doc.LoadHtml(item.Summary.Text);
-                    string imageSource = string.Empty;
                     string summary = string.Empty;
+                    string imageSource;
                     try
                     {
                         imageSource = doc.DocumentNode.Descendants("img").First().GetAttributeValue("src", string.Empty);
@@ -518,6 +558,11 @@ namespace Newsticker.ViewModel
         }
         private void LoadCNN(object obj)
         {
+            if (obj is null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
             ObservableCollection<ArticleModel> cNNArticles = new ObservableCollection<ArticleModel>();
             // TODO: Generell überall auf null und so abfragen den rss Feed
             using (XmlReader reader = XmlReader.Create("http://rss.cnn.com/rss/cnn_latest.rss"))
@@ -527,7 +572,7 @@ namespace Newsticker.ViewModel
             {
                 cNNArticles.Clear();
                 SyndicationFeed feed = SyndicationFeed.Load(reader);
-                
+
                 foreach (var item in feed.Items)
                 {
                     var doc = new HtmlDocument();
@@ -560,6 +605,11 @@ namespace Newsticker.ViewModel
         }
         private void LoadSZ(object obj)
         {
+            if (obj is null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
             ObservableCollection<ArticleModel> sZArticles = new ObservableCollection<ArticleModel>();
 
             using (XmlReader reader = XmlReader.Create("https://rss.sueddeutsche.de/rss/Topthemen"))
@@ -573,8 +623,8 @@ namespace Newsticker.ViewModel
                 {
                     var doc = new HtmlDocument();
                     doc.LoadHtml(item.Summary.Text);
-                    string imageSource = string.Empty;
                     string summary = string.Empty;
+                    string imageSource;
                     // TODO: TryCatch Summary und ImageUrl trennen, irgendwa sgutes einfallen lassen
                     try
                     {
@@ -606,6 +656,11 @@ namespace Newsticker.ViewModel
         }
         private void LoadFAZ(object obj)
         {
+            if (obj is null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
             ObservableCollection<ArticleModel> fAZArticles = new ObservableCollection<ArticleModel>();
 
             using (XmlReader reader = XmlReader.Create("https://www.faz.net/rss/aktuell"))
@@ -617,8 +672,8 @@ namespace Newsticker.ViewModel
                 {
                     var doc = new HtmlDocument();
                     doc.LoadHtml(item.Summary.Text);
-                    string imageSource = string.Empty;
                     string summary = string.Empty;
+                    string imageSource;
                     try
                     {
                         imageSource = doc.DocumentNode.Descendants("img").First().GetAttributeValue("src", string.Empty);
@@ -649,6 +704,11 @@ namespace Newsticker.ViewModel
         }
         private void LoadTagesschau(object obj)
         {
+            if (obj is null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
             ObservableCollection<ArticleModel> tagesschauArticles = new ObservableCollection<ArticleModel>();
 
             using (XmlReader reader = XmlReader.Create("https://www.tagesschau.de/xml/rss2"))
@@ -664,14 +724,13 @@ namespace Newsticker.ViewModel
 System.ServiceModel.Syndication.SyndicationFeed.ImageUrl.get hat null zurückgegeben.
                      */
 
-                    string imageSource = string.Empty;
                     //if (feed.ImageUrl?.AbsoluteUri == null)
                     //{
                     //    imageSource = "/Images/tagesschau.png";
                     //}
                     //else
                     //{
-                    imageSource = feed.ImageUrl?.AbsoluteUri;
+                    string imageSource = feed.ImageUrl?.AbsoluteUri;
                     //}
                     tagesschauArticles.Add(new ArticleModel
                     {
@@ -694,49 +753,71 @@ System.ServiceModel.Syndication.SyndicationFeed.ImageUrl.get hat null zurückgeg
         }
         public void LoadWeather(object obj)
         {
-            // TODO: Weathericons from here https://www.flaticon.com/packs/weather-19
-            SyndicationFeed feed2;
-            using (XmlReader reader = XmlReader.Create(locationRssLookup[WeatherLocationsList.Current]))
+            WeatherIsLoading = true;
+            WeatherBackgroundWorker = new BackgroundWorker();
+            WeatherSpinnerVisibility = "Visible";
+            // Weathericons from here https://www.flaticon.com/packs/weather-19
+            if (obj is null)
             {
-                feed2 = SyndicationFeed.Load(reader);
-            };
-            HtmlDocument htmlCurrentWeather = new HtmlDocument();
-            htmlCurrentWeather.LoadHtml(feed2.Items.First().Summary.Text);
-            string temperature = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[2].InnerText, "[ \\n]", string.Empty);
-            string feel = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[8].InnerText, "[ \\n]", string.Empty);
-            string dewPoint = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[12].InnerText, "[ \\n]", string.Empty);
-            string relativeHumidity = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[18].InnerText, "[ \\n]", string.Empty);
-            Weather.Temperature = HttpUtility.HtmlDecode(temperature);
-            Weather.Feel = HttpUtility.HtmlDecode(feel);
-            Weather.DewPoint = HttpUtility.HtmlDecode(dewPoint);
-            Weather.RelativeHumidity = HttpUtility.HtmlDecode(relativeHumidity);
-            Weather.UpdateTime = feed2.LastUpdatedTime.LocalDateTime;
-            Weather.Location = feed2.Items.ElementAt(1).Title.Text.Split(' ').First();
-            HtmlDocument htmlWeatherForecast = new HtmlDocument();
-            htmlWeatherForecast.LoadHtml(feed2.Items.ElementAt(1).Summary.Text);
-            // ImageSource
-            string weatherConditionAsGif = htmlWeatherForecast.DocumentNode.Descendants("img").First().GetAttributeValue("src", string.Empty).Split('/').Last(); // e.g. sunny.gif
-            string imageSource = "/Images/Weather/" + Path.GetFileNameWithoutExtension(weatherConditionAsGif) + ".png";
-            Weather.ImageSource = imageSource;
-            //if ()
-            //{
-            //    Weather.ImageSource = imageSource;
-            //}
-            //else
-            //{
-            //    Weather.ImageSource = htmlWeatherForecast.DocumentNode.Descendants("img").First().GetAttributeValue("src", string.Empty);
-            //}
+                throw new ArgumentNullException(nameof(obj));
+            }
+            WeatherBackgroundWorker.DoWork += delegate
+            {
+                SyndicationFeed feed2;
+                using (XmlReader reader = XmlReader.Create(LocationRssLookup[WeatherLocationsList.Current]))
+                {
+                    feed2 = SyndicationFeed.Load(reader);
+                };
+                HtmlDocument htmlCurrentWeather = new HtmlDocument();
+                htmlCurrentWeather.LoadHtml(feed2.Items.First().Summary.Text);
+                string temperature = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[2].InnerText, "[ \\n]", string.Empty);
+                string feel = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[8].InnerText, "[ \\n]", string.Empty);
+                string dewPoint = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[12].InnerText, "[ \\n]", string.Empty);
+                string relativeHumidity = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[18].InnerText, "[ \\n]", string.Empty);
+                Weather.Temperature = HttpUtility.HtmlDecode(temperature);
+                Weather.Feel = HttpUtility.HtmlDecode(feel);
+                Weather.DewPoint = HttpUtility.HtmlDecode(dewPoint);
+                Weather.RelativeHumidity = HttpUtility.HtmlDecode(relativeHumidity);
+                Weather.UpdateTime = feed2.LastUpdatedTime.LocalDateTime;
+                Weather.WeekDay = Weather.UpdateTime.ToString("dddd", new CultureInfo("de-DE"));
 
-            string temperatureRange = HttpUtility.HtmlDecode(Regex.Replace(htmlWeatherForecast.DocumentNode.ChildNodes[8].InnerText, "[ \\n]", string.Empty));
-            Weather.Low = temperatureRange.Split('-')[0];
-            Weather.High = temperatureRange.Split('-')[1];
-            string wind = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[22].InnerText, "[ \\n]", string.Empty);
-            Weather.Wind = HttpUtility.HtmlDecode(wind);
-            // TODO: Check if this gets a value while raining or always nothing
-            string rain = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[28].InnerText, "[ \\n]", string.Empty);
-            Weather.Rain = HttpUtility.HtmlDecode(rain);
-            string pressure = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[32].InnerText, "[ \\n]", string.Empty);
-            Weather.Pressure = HttpUtility.HtmlDecode(pressure);
+                Weather.Location = feed2.Items.ElementAt(1).Title.Text.Split(' ').First();
+                HtmlDocument htmlWeatherForecast = new HtmlDocument();
+                htmlWeatherForecast.LoadHtml(feed2.Items.ElementAt(1).Summary.Text);
+                // ImageSource
+                string weatherConditionAsGif = htmlWeatherForecast.DocumentNode.Descendants("img").First().GetAttributeValue("src", string.Empty).Split('/').Last(); // e.g. sunny.gif
+                string imageSource = "/Images/Weather/" + Path.GetFileNameWithoutExtension(weatherConditionAsGif) + ".png";
+                Weather.ImageSource = imageSource;
+                //if ()
+                //{
+                //    Weather.ImageSource = imageSource;
+                //}
+                //else
+                //{
+                //    Weather.ImageSource = htmlWeatherForecast.DocumentNode.Descendants("img").First().GetAttributeValue("src", string.Empty);
+                //}
+
+                string temperatureRange = HttpUtility.HtmlDecode(Regex.Replace(htmlWeatherForecast.DocumentNode.ChildNodes[8].InnerText, "[ \\n]", string.Empty));
+                Weather.Low = temperatureRange.Split('-')[0];
+                Weather.High = temperatureRange.Split('-')[1];
+                string pressure = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[32].InnerText, "[ \\n]", string.Empty);
+                Weather.Pressure = HttpUtility.HtmlDecode(pressure);
+
+                Weather.NextWeekDay = Weather.UpdateTime.AddDays(1.0).ToString("dddd", new CultureInfo("de-DE"));
+                //Weather.NextDayInfo=;
+                //weather.NextDayImageSource=;
+
+                Weather.OverNextWeekDay = Weather.UpdateTime.AddDays(2.0).ToString("dddd", new CultureInfo("de-DE"));
+                //Weather.OverNextDayInfo=;
+                //Weather.OverNextDayImageSource=;
+            };
+            WeatherBackgroundWorker.RunWorkerCompleted += delegate {
+                WeatherSpinnerVisibility = "Hidden";
+                WeatherBackgroundWorker.Dispose();
+                WeatherIsLoading=false;
+            };
+            WeatherBackgroundWorker.RunWorkerAsync();
+            
         }
         #endregion
 
@@ -801,8 +882,7 @@ System.ServiceModel.Syndication.SyndicationFeed.ImageUrl.get hat null zurückgeg
             if (readingDate)
             {
                 string dateString = base.ReadString();
-                DateTime dt;
-                if (!DateTime.TryParse(dateString, out dt))
+                if (!DateTime.TryParse(dateString, out DateTime dt))
                     dt = DateTime.ParseExact(dateString, CustomUtcDateTimeFormat, CultureInfo.InvariantCulture);
                 return dt.ToUniversalTime().ToString("R", CultureInfo.InvariantCulture);
             }
