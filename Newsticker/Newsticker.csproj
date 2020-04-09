@@ -87,11 +87,19 @@
     <Compile Include="Controls\SpinnerControl2.xaml.cs">
       <DependentUpon>SpinnerControl2.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Reader\CnnRssTransformer.cs" />
+    <Compile Include="Reader\FazRssTransformer.cs" />
+    <Compile Include="Reader\RssTransformerBase.cs" />
     <Compile Include="Models\ArticleModel.cs" />
     <Compile Include="Models\ModelBase.cs" />
     <Compile Include="Models\ObservableCollectionEx.cs" />
     <Compile Include="Models\WeatherModel.cs" />
+    <Compile Include="Reader\NzzRssTransformer.cs" />
+    <Compile Include="Reader\SzRssTransformer.cs" />
+    <Compile Include="Reader\TagesschauRssTransformer.cs" />
+    <Compile Include="Reader\ZeitRssTransformer.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
+    <Compile Include="Reader\SyndicationFeedValidXmlReader.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

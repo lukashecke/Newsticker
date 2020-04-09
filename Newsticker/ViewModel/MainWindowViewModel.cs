@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using Newsticker.Commands;
 using Newsticker.Models;
+using Newsticker.Reader;
 using Newsticker.View;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,6 @@ namespace Newsticker.ViewModel
 {
     class MainWindowViewModel : ViewModelBase
     {
-
         #region properties
         private bool WeatherIsLoading { get; set; }
         private BackgroundWorker WeatherBackgroundWorker { get; set; }
@@ -260,17 +260,17 @@ namespace Newsticker.ViewModel
         #region constructors
         public MainWindowViewModel(string loadingState)
         {
-            this.CloseCommand = new RelayCommand(ExecuteCloseCommand, CanExecuteClose);
-            this.RestoreCommand = new RelayCommand(ExecuteRestoreCommand, CanExecuteRestore);
-            this.MinimizeCommand = new RelayCommand(ExecuteMinimizeCommand, CanExecuteMinimize);
-            this.TagesschauCommand = new RelayCommand(ExecuteTagesschauCommand, CanExecuteTagesschau);
-            this.FAZCommand = new RelayCommand(ExecuteFAZCommand, CanExecuteFAZ);
-            this.SZCommand = new RelayCommand(ExecuteSZCommand, CanExecuteSZ);
-            this.CNNCommand = new RelayCommand(ExecuteCNNCommand, CanExecuteCNN);
-            this.NZZCommand = new RelayCommand(ExecuteNZZCommand, CanExecuteNZZ);
-            this.ZeitCommand = new RelayCommand(ExecuteZeitCommand, CanExecuteZeit);
-            this.UpdateCommand = new RelayCommand(ExecuteUpdateCommand, CanExecuteUpdate);
-
+            InitializeCommands();
+            InitializeLocationRssLookup();
+            if (loadingState.Equals("preLoad"))
+            {
+                LoadAllComponents();
+                WaitForWeatherBackgroundWorker();
+                LoadingScreenVisibility = "Hidden"; // Wird fälschlicherweise noch kurz angezeigt, obwohl schon geladen im Pre-Load-Aufruf
+            }
+        }
+        private void InitializeLocationRssLookup()
+        {
             //WeatherLocationsList.Add("");
             //locationRssLookup.Add("", "");
             LocationRssLookup = new Dictionary<string, string>();
@@ -286,17 +286,24 @@ namespace Newsticker.ViewModel
             LocationRssLookup.Add("Warszawa", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160277&obs=1&fc=1");
             WeatherLocationsList.Add("Beijing");
             LocationRssLookup.Add("Beijing", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160059&obs=1&fc=1");
-
-            if (loadingState.Equals("preLoad"))
-            {
-                LoadAllComponents();
-                WaitForWeatherBackgroundWorker();
-                LoadingScreenVisibility = "Hidden"; // Wird fälschlicherweise noch kurz angezeigt, obwohl schon geladen im Pre-Load-Aufruf
-            }
+        }
+        private void InitializeCommands()
+        {
+            this.CloseCommand = new RelayCommand(ExecuteCloseCommand, CanExecuteClose);
+            this.RestoreCommand = new RelayCommand(ExecuteRestoreCommand, CanExecuteRestore);
+            this.MinimizeCommand = new RelayCommand(ExecuteMinimizeCommand, CanExecuteMinimize);
+            this.TagesschauCommand = new RelayCommand(ExecuteTagesschauCommand, CanExecuteTagesschau);
+            this.FAZCommand = new RelayCommand(ExecuteFAZCommand, CanExecuteFAZ);
+            this.SZCommand = new RelayCommand(ExecuteSZCommand, CanExecuteSZ);
+            this.CNNCommand = new RelayCommand(ExecuteCNNCommand, CanExecuteCNN);
+            this.NZZCommand = new RelayCommand(ExecuteNZZCommand, CanExecuteNZZ);
+            this.ZeitCommand = new RelayCommand(ExecuteZeitCommand, CanExecuteZeit);
+            this.UpdateCommand = new RelayCommand(ExecuteUpdateCommand, CanExecuteUpdate);
         }
         #endregion
 
         #region commands
+        // TODO: Wenn zwischen den einzelnen reitern der Zeitschriften rumgesprungen wird, soll der scroller immer wieder am start der seite sein, bislang wird diese information weitergegeben, wenn zb sz zu ende gelesen und auf cnn geklickt wird befindet man sich am ende der seite
         private void ExecuteUpdateCommand(object obj)
         {
             LoadAllComponents();
@@ -434,7 +441,6 @@ namespace Newsticker.ViewModel
 
         private void BackgroundWorker_LoadAllComponents(object sender, DoWorkEventArgs e)
         {
-            
             LoadWeather(new object());
             LoadCNN(new object());
             LoadSZ(new object());
@@ -443,7 +449,6 @@ namespace Newsticker.ViewModel
             LoadZeit(new object());
             LoadNZZ(new object());
         }
-
         private void WaitForWeatherBackgroundWorker()
         {
             while (WeatherIsLoading)
@@ -451,58 +456,24 @@ namespace Newsticker.ViewModel
                 // Wait for it
             }
         }
-
         private void LoadNZZ(object obj)
         {
             if (obj is null)
             {
                 throw new ArgumentNullException(nameof(obj));
             }
-
-            ObservableCollection<ArticleModel> nZZArticles = new ObservableCollection<ArticleModel>();
-
-            SyndicationFeed feed = new SyndicationFeed();
-            using (XmlReader r = new MyXmlReader("https://www.nzz.ch/recent.rss"))
-            {
-                // Neuste Artikel: https://www.nzz.ch/recent.rss
-                // Topthemen der Startseite https://www.nzz.ch/startseite.rss
-                // Intenational https://www.nzz.ch/international.rss
-                feed = SyndicationFeed.Load(r);
-            }
-            nZZArticles.Clear();
-            int i = 0;
-            string htmlString = new WebClient().DownloadString("https://www.nzz.ch/recent.rss");
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(htmlString);
-            foreach (var item in feed.Items)
-            {
-                string imageSource = string.Empty;
-                try
-                {
-                    imageSource = htmlDoc.DocumentNode.Descendants("media:thumbnail").ElementAt(i).GetAttributeValue("url", string.Empty);
-                }
-                catch (Exception)
-                {
-                    // TODO: NZZ Default Image hinzufügrn nd generell eigene default bilder weil die die vom feed angeboten werden total schlechte auflösung sind und generell einfach scheiße
-                }
-                nZZArticles.Add(new ArticleModel
-                {
-                    Header = item.Title.Text,
-                    Summary = item.Summary?.Text,
-                    Link = item.Id,
-                    Date = item.PublishDate.DateTime.ToLocalTime(),
-                    ImageSource = imageSource
-                });
-                i++;
-            }
+            NzzRssTransformer nzzRssTransformer = new NzzRssTransformer("https://www.nzz.ch/recent.rss");
+            // Neuste Artikel https://www.nzz.ch/recent.rss
+            // Topthemen der Startseite https://www.nzz.ch/startseite.rss
+            // International https://www.nzz.ch/international.rss
 
             if (!Cache.ContainsKey("NZZ"))
             {
-                Cache.Add("NZZ", nZZArticles);
+                Cache.Add("NZZ", nzzRssTransformer.GetArticles());
             }
             else
             {
-                Cache["NZZ"] = nZZArticles;
+                Cache["NZZ"] = nzzRssTransformer.GetArticles();
             }
         }
         private void LoadZeit(object obj)
@@ -512,48 +483,18 @@ namespace Newsticker.ViewModel
                 throw new ArgumentNullException(nameof(obj));
             }
 
-            ObservableCollection<ArticleModel> zeitArticles = new ObservableCollection<ArticleModel>();
-
-            using (XmlReader reader = XmlReader.Create("http://newsfeed.zeit.de/"))
+            ZeitRssTransformer zeitRssTransformer = new ZeitRssTransformer("http://newsfeed.zeit.de/");
             // Die Zet Zeitung RSS Verzeivhnis http://newsfeed.zeit.de/
             // Zeit Online News http://newsfeed.zeit.de/news/index
             // Zeit Online Homepage http://newsfeed.zeit.de/index
-            {
-                zeitArticles.Clear();
-                SyndicationFeed feed = SyndicationFeed.Load(reader);
-                foreach (var item in feed.Items)
-                {
-                    var doc = new HtmlDocument();
-                    doc.LoadHtml(item.Summary.Text);
-                    string summary = string.Empty;
-                    string imageSource;
-                    try
-                    {
-                        imageSource = doc.DocumentNode.Descendants("img").First().GetAttributeValue("src", string.Empty);
-                        summary = doc.DocumentNode.InnerText.Remove(0, 1);
-                    }
-                    catch (Exception)
-                    {
-                        imageSource = feed.ImageUrl.AbsoluteUri;
-                    }
-                    zeitArticles.Add(new ArticleModel
-                    {
-                        Header = item.Title.Text,
-                        Summary = summary,
-                        Link = item.Links[0].Uri.AbsoluteUri,
-                        Date = item.PublishDate.DateTime.ToLocalTime(),
-                        ImageSource = imageSource
-                    });
-                }
-            };
 
             if (!Cache.ContainsKey("Zeit"))
             {
-                Cache.Add("Zeit", zeitArticles);
+                Cache.Add("Zeit", zeitRssTransformer.GetArticles());
             }
             else
             {
-                Cache["Zeit"] = zeitArticles;
+                Cache["Zeit"] = zeitRssTransformer.GetArticles();
             }
         }
         private void LoadCNN(object obj)
@@ -562,45 +503,18 @@ namespace Newsticker.ViewModel
             {
                 throw new ArgumentNullException(nameof(obj));
             }
-
-            ObservableCollection<ArticleModel> cNNArticles = new ObservableCollection<ArticleModel>();
-            // TODO: Generell überall auf null und so abfragen den rss Feed
-            using (XmlReader reader = XmlReader.Create("http://rss.cnn.com/rss/cnn_latest.rss"))
+            CnnRssTransformer cnnRssTransformer = new CnnRssTransformer("http://rss.cnn.com/rss/cnn_latest.rss");
             // Top Stories http://rss.cnn.com/rss/edition.rss
             // World http://rss.cnn.com/rss/edition_world.rss
             // Most Recent http://rss.cnn.com/rss/cnn_latest.rss
-            {
-                cNNArticles.Clear();
-                SyndicationFeed feed = SyndicationFeed.Load(reader);
 
-                foreach (var item in feed.Items)
-                {
-                    var doc = new HtmlDocument();
-                    doc.LoadHtml(item.Summary.Text);
-                    string summary = string.Empty;
-                    try
-                    {
-                        summary = doc.DocumentNode.ChildNodes[0].InnerHtml;
-                    }
-                    catch (Exception)
-                    {
-                    }
-                    cNNArticles.Add(new ArticleModel
-                    {
-                        Header = item.Title.Text,
-                        Summary = summary,
-                        Link = item.Id,
-                        Date = item.PublishDate.DateTime.ToLocalTime()
-                    });
-                }
-            };
             if (!Cache.ContainsKey("CNN"))
             {
-                Cache.Add("CNN", cNNArticles);
+                Cache.Add("CNN", cnnRssTransformer.GetArticles());
             }
             else
             {
-                Cache["CNN"] = cNNArticles;
+                Cache["CNN"] = cnnRssTransformer.GetArticles();
             }
         }
         private void LoadSZ(object obj)
@@ -610,48 +524,18 @@ namespace Newsticker.ViewModel
                 throw new ArgumentNullException(nameof(obj));
             }
 
-            ObservableCollection<ArticleModel> sZArticles = new ObservableCollection<ArticleModel>();
-
-            using (XmlReader reader = XmlReader.Create("https://rss.sueddeutsche.de/rss/Topthemen"))
+            SzRssTransformer szRssTransformer = new SzRssTransformer("https://rss.sueddeutsche.de/rss/Topthemen");
             // Top-Themen (alle Artikel der Homepage) https://rss.sueddeutsche.de/rss/Topthemen
             //Alle Artikel (alle Artikel auf ganz SZ.de) https://rss.sueddeutsche.de/app/service/rss/alles/index.rss?output=rss
             // Allgemeine Eilmeldung (wichtige Meldungen aus allen Ressorts) https://rss.sueddeutsche.de/rss/Eilmeldungen
-            {
-                sZArticles.Clear();
-                SyndicationFeed feed = SyndicationFeed.Load(reader);
-                foreach (var item in feed.Items)
-                {
-                    var doc = new HtmlDocument();
-                    doc.LoadHtml(item.Summary.Text);
-                    string summary = string.Empty;
-                    string imageSource;
-                    // TODO: TryCatch Summary und ImageUrl trennen, irgendwa sgutes einfallen lassen
-                    try
-                    {
-                        imageSource = doc.DocumentNode.Descendants("img").First().GetAttributeValue("src", string.Empty);
-                        summary = doc.DocumentNode.Descendants("p").First().InnerText;
-                    }
-                    catch (Exception)
-                    {
-                        imageSource = feed.ImageUrl.AbsoluteUri;
-                    }
-                    sZArticles.Add(new ArticleModel
-                    {
-                        Header = item.Title.Text,
-                        Summary = summary,
-                        Link = item.Links[0].Uri.AbsoluteUri,
-                        Date = item.PublishDate.DateTime.ToLocalTime(),
-                        ImageSource = imageSource
-                    });
-                }
-            };
+
             if (!Cache.ContainsKey("SZ"))
             {
-                Cache.Add("SZ", sZArticles);
+                Cache.Add("SZ", szRssTransformer.GetArticles());
             }
             else
             {
-                Cache["SZ"] = sZArticles;
+                Cache["SZ"] = szRssTransformer.GetArticles();
             }
         }
         private void LoadFAZ(object obj)
@@ -661,45 +545,16 @@ namespace Newsticker.ViewModel
                 throw new ArgumentNullException(nameof(obj));
             }
 
-            ObservableCollection<ArticleModel> fAZArticles = new ObservableCollection<ArticleModel>();
-
-            using (XmlReader reader = XmlReader.Create("https://www.faz.net/rss/aktuell"))
+            FazRssTransformer fazRssTransformer = new FazRssTransformer("https://www.faz.net/rss/aktuell");
             // Aktuell https://www.faz.net/rss/aktuell
-            {
-                fAZArticles.Clear();
-                SyndicationFeed feed = SyndicationFeed.Load(reader);
-                foreach (var item in feed.Items)
-                {
-                    var doc = new HtmlDocument();
-                    doc.LoadHtml(item.Summary.Text);
-                    string summary = string.Empty;
-                    string imageSource;
-                    try
-                    {
-                        imageSource = doc.DocumentNode.Descendants("img").First().GetAttributeValue("src", string.Empty);
-                        summary = doc.DocumentNode.Descendants("p").First().InnerText;
-                    }
-                    catch (Exception)
-                    {
-                        imageSource = feed.ImageUrl.AbsoluteUri;
-                    }
-                    fAZArticles.Add(new ArticleModel
-                    {
-                        Header = item.Title.Text,
-                        Summary = summary,
-                        Link = item.Id,
-                        Date = item.PublishDate.DateTime,
-                        ImageSource = imageSource
-                    });
-                }
-            };
+
             if (!Cache.ContainsKey("FAZ"))
             {
-                Cache.Add("FAZ", fAZArticles);
+                Cache.Add("FAZ", fazRssTransformer.GetArticles());
             }
             else
             {
-                Cache["FAZ"] = fAZArticles;
+                Cache["FAZ"] = fazRssTransformer.GetArticles();
             }
         }
         private void LoadTagesschau(object obj)
@@ -709,46 +564,16 @@ namespace Newsticker.ViewModel
                 throw new ArgumentNullException(nameof(obj));
             }
 
-            ObservableCollection<ArticleModel> tagesschauArticles = new ObservableCollection<ArticleModel>();
-
-            using (XmlReader reader = XmlReader.Create("https://www.tagesschau.de/xml/rss2"))
+            TagesschauRssTransformer tagesschauRssTransformer = new TagesschauRssTransformer("https://www.tagesschau.de/xml/rss2");
             // Tagesschau RSS Feed https://www.tagesschau.de/xml/rss2
-            {
-                tagesschauArticles.Clear();
-                SyndicationFeed feed = SyndicationFeed.Load(reader);
-                foreach (var item in feed.Items)
-                {
-                    // TODO: Exceptionsicher machen und das auch nicht nur hier!!!!!!!
-                    /*System.NullReferenceException: "Der Objektverweis wurde nicht auf eine Objektinstanz festgelegt."
 
-System.ServiceModel.Syndication.SyndicationFeed.ImageUrl.get hat null zurückgegeben.
-                     */
-
-                    //if (feed.ImageUrl?.AbsoluteUri == null)
-                    //{
-                    //    imageSource = "/Images/tagesschau.png";
-                    //}
-                    //else
-                    //{
-                    string imageSource = feed.ImageUrl?.AbsoluteUri;
-                    //}
-                    tagesschauArticles.Add(new ArticleModel
-                    {
-                        Header = item.Title.Text,
-                        Summary = item.Summary.Text,
-                        Link = item.Id,
-                        Date = item.PublishDate.DateTime,
-                        ImageSource = imageSource
-                    });
-                }
-            };
             if (!Cache.ContainsKey("Tagesschau"))
             {
-                Cache.Add("Tagesschau", tagesschauArticles);
+                Cache.Add("Tagesschau", tagesschauRssTransformer.GetArticles());
             }
             else
             {
-                Cache["Tagesschau"] = tagesschauArticles;
+                Cache["Tagesschau"] = tagesschauRssTransformer.GetArticles();
             }
         }
         public void LoadWeather(object obj)
@@ -811,13 +636,14 @@ System.ServiceModel.Syndication.SyndicationFeed.ImageUrl.get hat null zurückgeg
                 //Weather.OverNextDayInfo=;
                 //Weather.OverNextDayImageSource=;
             };
-            WeatherBackgroundWorker.RunWorkerCompleted += delegate {
+            WeatherBackgroundWorker.RunWorkerCompleted += delegate
+            {
                 WeatherSpinnerVisibility = "Hidden";
                 WeatherBackgroundWorker.Dispose();
-                WeatherIsLoading=false;
+                WeatherIsLoading = false;
             };
             WeatherBackgroundWorker.RunWorkerAsync();
-            
+
         }
         #endregion
 
@@ -844,52 +670,5 @@ System.ServiceModel.Syndication.SyndicationFeed.ImageUrl.get hat null zurückgeg
             Application.Current.MainWindow.Close();
         }
         #endregion
-    }
-    /// <summary>
-    /// Workaround-class to read in xml-files Syndicationfeed-valid DateTime objects
-    /// </summary>
-    class MyXmlReader : XmlTextReader
-    {
-        private bool readingDate = false;
-        const string CustomUtcDateTimeFormat = "ddd MMM dd HH:mm:ss Z yyyy"; // Wed Oct 07 08:00:07 GMT 2009
-
-        public MyXmlReader(Stream s) : base(s) { }
-
-        public MyXmlReader(string inputUri) : base(inputUri) { }
-
-        public override void ReadStartElement()
-        {
-            if (string.Equals(base.NamespaceURI, string.Empty, StringComparison.InvariantCultureIgnoreCase) &&
-                (string.Equals(base.LocalName, "lastBuildDate", StringComparison.InvariantCultureIgnoreCase) ||
-                string.Equals(base.LocalName, "pubDate", StringComparison.InvariantCultureIgnoreCase)))
-            {
-                readingDate = true;
-            }
-            base.ReadStartElement();
-        }
-
-        public override void ReadEndElement()
-        {
-            if (readingDate)
-            {
-                readingDate = false;
-            }
-            base.ReadEndElement();
-        }
-
-        public override string ReadString()
-        {
-            if (readingDate)
-            {
-                string dateString = base.ReadString();
-                if (!DateTime.TryParse(dateString, out DateTime dt))
-                    dt = DateTime.ParseExact(dateString, CustomUtcDateTimeFormat, CultureInfo.InvariantCulture);
-                return dt.ToUniversalTime().ToString("R", CultureInfo.InvariantCulture);
-            }
-            else
-            {
-                return base.ReadString();
-            }
-        }
     }
 }
