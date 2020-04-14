@@ -277,5 +277,44 @@ namespace Newsticker.Models
                 }
             }
         }
+        private string overOverNextWeekDay;
+        public string OverOverNextWeekDay
+        {
+            get { return overOverNextWeekDay; }
+            set
+            {
+                if (overOverNextWeekDay != value)
+                {
+                    overOverNextWeekDay = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+        private string overOverNextDayInfo;
+        public string OverOverNextDayInfo
+        {
+            get { return overOverNextDayInfo; }
+            set
+            {
+                if (overOverNextDayInfo != value)
+                {
+                    overOverNextDayInfo = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+        private string overOverNextDayImageSource;
+        public string OverOverNextDayImageSource
+        {
+            get { return overOverNextDayImageSource; }
+            set
+            {
+                if (overOverNextDayImageSource != value)
+                {
+                    overOverNextDayImageSource = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
     }
 }

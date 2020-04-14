@@ -280,10 +280,10 @@ namespace Newsticker.ViewModel
             LocationRssLookup.Add("London", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160127&obs=1&fc=1");
             WeatherLocationsList.Add("Washington DC");
             LocationRssLookup.Add("Washington DC", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160136&obs=1&fc=1");
-            WeatherLocationsList.Add("Wrocław");
-            LocationRssLookup.Add("Wrocław", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160911&obs=1&fc=1");
-            WeatherLocationsList.Add("Warszawa");
-            LocationRssLookup.Add("Warszawa", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160277&obs=1&fc=1");
+            WeatherLocationsList.Add("Breslau");
+            LocationRssLookup.Add("Breslau", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160911&obs=1&fc=1");
+            WeatherLocationsList.Add("Warschau");
+            LocationRssLookup.Add("Warschau", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160277&obs=1&fc=1");
             WeatherLocationsList.Add("Beijing");
             LocationRssLookup.Add("Beijing", "https://rss.weatherzone.com.au/?u=12994-1285&lt=twcid&lc=160059&obs=1&fc=1");
         }
@@ -594,7 +594,7 @@ namespace Newsticker.ViewModel
                     feed2 = SyndicationFeed.Load(reader);
                 };
                 HtmlDocument htmlCurrentWeather = new HtmlDocument();
-                htmlCurrentWeather.LoadHtml(feed2.Items.First().Summary.Text);
+                htmlCurrentWeather.LoadHtml(feed2.Items.ElementAt(0).Summary.Text);
                 string temperature = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[2].InnerText, "[ \\n]", string.Empty);
                 string feel = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[8].InnerText, "[ \\n]", string.Empty);
                 string dewPoint = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[12].InnerText, "[ \\n]", string.Empty);
@@ -609,18 +609,11 @@ namespace Newsticker.ViewModel
                 Weather.Location = feed2.Items.ElementAt(1).Title.Text.Split(' ').First();
                 HtmlDocument htmlWeatherForecast = new HtmlDocument();
                 htmlWeatherForecast.LoadHtml(feed2.Items.ElementAt(1).Summary.Text);
+                // First Data Package in the weather forecast is for the current day
                 // ImageSource
-                string weatherConditionAsGif = htmlWeatherForecast.DocumentNode.Descendants("img").First().GetAttributeValue("src", string.Empty).Split('/').Last(); // e.g. sunny.gif
+                string weatherConditionAsGif = htmlWeatherForecast.DocumentNode.Descendants("img").ElementAt(0).GetAttributeValue("src", string.Empty).Split('/').Last(); // e.g. sunny.gif
                 string imageSource = "/Images/Weather/" + Path.GetFileNameWithoutExtension(weatherConditionAsGif) + ".png";
                 Weather.ImageSource = imageSource;
-                //if ()
-                //{
-                //    Weather.ImageSource = imageSource;
-                //}
-                //else
-                //{
-                //    Weather.ImageSource = htmlWeatherForecast.DocumentNode.Descendants("img").First().GetAttributeValue("src", string.Empty);
-                //}
 
                 string temperatureRange = HttpUtility.HtmlDecode(Regex.Replace(htmlWeatherForecast.DocumentNode.ChildNodes[8].InnerText, "[ \\n]", string.Empty));
                 Weather.Low = temperatureRange.Split('-')[0];
@@ -629,12 +622,22 @@ namespace Newsticker.ViewModel
                 Weather.Pressure = HttpUtility.HtmlDecode(pressure);
 
                 Weather.NextWeekDay = Weather.UpdateTime.AddDays(1.0).ToString("dddd", new CultureInfo("de-DE"));
-                //Weather.NextDayInfo=;
-                //weather.NextDayImageSource=;
+                Weather.NextDayInfo = HttpUtility.HtmlDecode(Regex.Replace(htmlWeatherForecast.DocumentNode.ChildNodes[19].InnerText, "[ \\n]", string.Empty)).Replace("C-", "C bis ");
+                string nextDayWeatherConditionAsGif = htmlWeatherForecast.DocumentNode.Descendants("img").ElementAt(1).GetAttributeValue("src", string.Empty).Split('/').Last();
+                string nextDayImageSource = "/Images/Weather/" + Path.GetFileNameWithoutExtension(nextDayWeatherConditionAsGif) + ".png";
+                weather.NextDayImageSource=nextDayImageSource;
 
                 Weather.OverNextWeekDay = Weather.UpdateTime.AddDays(2.0).ToString("dddd", new CultureInfo("de-DE"));
-                //Weather.OverNextDayInfo=;
-                //Weather.OverNextDayImageSource=;
+                Weather.OverNextDayInfo = HttpUtility.HtmlDecode(Regex.Replace(htmlWeatherForecast.DocumentNode.ChildNodes[30].InnerText, "[ \\n]", string.Empty)).Replace("C-", "C bis ");
+                string overNextDayWeatherConditionAsGif = htmlWeatherForecast.DocumentNode.Descendants("img").ElementAt(2).GetAttributeValue("src", string.Empty).Split('/').Last();
+                string overNextDayImageSource = "/Images/Weather/" + Path.GetFileNameWithoutExtension(overNextDayWeatherConditionAsGif) + ".png";
+                weather.OverNextDayImageSource = overNextDayImageSource;
+
+                Weather.OverOverNextWeekDay = Weather.UpdateTime.AddDays(3.0).ToString("dddd", new CultureInfo("de-DE"));
+                Weather.OverOverNextDayInfo = HttpUtility.HtmlDecode(Regex.Replace(htmlWeatherForecast.DocumentNode.ChildNodes[41].InnerText, "[ \\n]", string.Empty)).Replace("C-", "C bis ");
+                string overOverNextDayWeatherConditionAsGif = htmlWeatherForecast.DocumentNode.Descendants("img").ElementAt(3).GetAttributeValue("src", string.Empty).Split('/').Last();
+                string overOverNextDayImageSource = "/Images/Weather/" + Path.GetFileNameWithoutExtension(overOverNextDayWeatherConditionAsGif) + ".png";
+                weather.OverOverNextDayImageSource = overOverNextDayImageSource;
             };
             WeatherBackgroundWorker.RunWorkerCompleted += delegate
             {
