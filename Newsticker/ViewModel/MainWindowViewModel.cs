@@ -616,8 +616,8 @@ namespace Newsticker.ViewModel
                 Weather.ImageSource = imageSource;
 
                 string temperatureRange = HttpUtility.HtmlDecode(Regex.Replace(htmlWeatherForecast.DocumentNode.ChildNodes[8].InnerText, "[ \\n]", string.Empty));
-                Weather.Low = temperatureRange.Split('-')[0];
-                Weather.High = temperatureRange.Split('-')[1];
+                Weather.Low = temperatureRange.Split('C')[0]+"C";
+                Weather.High = (temperatureRange.Split('C')[1]+"C").Substring(1);
                 string pressure = Regex.Replace(htmlCurrentWeather.DocumentNode.ChildNodes[32].InnerText, "[ \\n]", string.Empty);
                 Weather.Pressure = HttpUtility.HtmlDecode(pressure);
 

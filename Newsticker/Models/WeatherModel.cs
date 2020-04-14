@@ -111,7 +111,7 @@ namespace Newsticker.Models
                 {
                     if (value.Equals("hPa"))
                     {
-                        pressure = "Keine Informationen verfügbar";
+                        pressure = "-";
                     }
                     else
                     {

@@ -176,7 +176,7 @@
                                 <Setter Property="Background" TargetName="splitBorder" Value="{StaticResource ComboBox.Static.Editable.Button.Background}"/>
                                 <Setter Property="BorderBrush" TargetName="splitBorder" Value="{StaticResource ComboBox.Static.Editable.Button.Border}"/>
                             </MultiDataTrigger>
-                            
+
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="true"/>
@@ -195,7 +195,7 @@
                                 <Setter Property="Background" TargetName="splitBorder" Value="{StaticResource ComboBox.MouseOver.Editable.Button.Background}"/>
                                 <Setter Property="BorderBrush" TargetName="splitBorder" Value="{StaticResource ComboBox.MouseOver.Editable.Button.Border}"/>
                             </MultiDataTrigger>
-                            
+
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding IsPressed, RelativeSource={RelativeSource Self}}" Value="true"/>
@@ -262,7 +262,7 @@
                 </Popup>
                 <ToggleButton x:Name="toggleButton" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Grid.ColumnSpan="2" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ComboBoxToggleButton}" FontWeight="Bold"/>
                 <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" Content="{TemplateBinding SelectionBoxItem}" ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" IsHitTestVisible="false" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
-                   
+
                 </ContentPresenter>
             </Grid>
             <ControlTemplate.Triggers>
@@ -545,7 +545,6 @@
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="*"/>
                                         </Grid.RowDefinitions>
-
                                         <TextBlock Text="{Binding Date, StringFormat=\{0:dd.MM.yyyy | HH:mm U\\hr\}}" 
                                            Foreground="White"
                                            Grid.Column="1" Grid.Row="0" />
@@ -571,17 +570,125 @@
                                                 </Style>
                                             </TextBlock.Style>
                                         </TextBlock>
-
                                     </Grid>
                                     <TextBlock Grid.Row="1" VerticalAlignment="Top"><Hyperlink NavigateUri="{Binding Link}" RequestNavigate="Hyperlink_RequestNavigate"><Run Text="Zum Artikel"/></Hyperlink></TextBlock>
                                 </Grid>
-
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>
-            <Grid Grid.Column="1" Margin="5,0,0,0">
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <StackPanel  Orientation="Vertical">
+                    <!--location-->
+                    <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0" HorizontalAlignment="Center">
+                        <TextBlock Text="Wetter in" Foreground="White" VerticalAlignment="Center"/>
+                        <ComboBox ItemsSource="{Binding WeatherLocationsList}" 
+                          SelectedItem="{Binding WeatherLocationsList.Current, Mode=TwoWay}" 
+                          SelectionChanged="ComboBox_SelectionChanged" HorizontalAlignment="Left"
+                          Style="{DynamicResource ComboBoxStyle1}"
+                          Foreground="White" ItemContainerStyle="{DynamicResource ComboBoxItemStyle1}">
+                            <ComboBox.Resources>
+                                <!-- Colour of ComboBoxItem -->
+                                <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#FF2D2D30" />
+                                <!-- Mouse over colour of ComboBoxItem -->
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF3F3F46" />
+                            </ComboBox.Resources>
+                            <ComboBox.Background>
+                                <StaticResource ResourceKey="VisualStudioLightGray"/>
+                            </ComboBox.Background>
+                        </ComboBox>
+                    </StackPanel>
+                    <!--updatetime-->
+                    <TextBlock Text="{Binding Weather.UpdateTime, StringFormat=\{0:Ak\\tuali\\sier\\t: dd.MM.yyyy HH:mm U\\hr\}}" Grid.Row="1" Grid.ColumnSpan="2" Foreground="White" HorizontalAlignment="Center"/>
+                    <!--current weather-->
+                    <Grid HorizontalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="{Binding Weather.Temperature}" Foreground="White" FontSize="35" VerticalAlignment="Bottom"/>
+                            <TextBlock Text="{Binding Weather.Feel, StringFormat=Gefühlt: \{0\}}" Grid.Row="1" Grid.ColumnSpan="2" Foreground="White" HorizontalAlignment="Center"/>
+                        </Grid>
+                        <Grid Grid.Column="1" Margin="0,2,10,10" >
+                            <Image Source="{Binding Weather.ImageSource}"  HorizontalAlignment="Left" Height="60" Margin="10,5,0,0"/>
+                        </Grid>
+                    </Grid>
+                    <!--more information-->
+                    <Grid HorizontalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Tiefsttemperatur: " Foreground="White" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0"/>
+                        <TextBlock Text="{Binding Weather.Low}" Foreground="White" HorizontalAlignment="Right" Grid.Row="0" Grid.Column="1"/>
+                        <TextBlock Text="Höchsttemperatur: " Foreground="White" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="0"/>
+                        <TextBlock Text="{Binding Weather.High}" Foreground="White" HorizontalAlignment="Right" Grid.Row="1" Grid.Column="1"/>
+                        <TextBlock Text="Taupunkt: " Foreground="White" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="0"/>
+                        <TextBlock Text="{Binding Weather.DewPoint}" Foreground="White" HorizontalAlignment="Right" Grid.Row="2" Grid.Column="1"/>
+                        <TextBlock Text="Luftfeuchtigkeit: " Foreground="White" HorizontalAlignment="Left" Grid.Row="3" Grid.Column="0"/>
+                        <TextBlock Text="{Binding Weather.RelativeHumidity}" Foreground="White" HorizontalAlignment="Right" Grid.Row="3" Grid.Column="1"/>
+                        <TextBlock Text="Luftdruck: " Foreground="White" HorizontalAlignment="Left" Grid.Row="4" Grid.Column="0"/>
+                        <TextBlock Text="{Binding Weather.Pressure}" Foreground="White" HorizontalAlignment="Right" Grid.Row="4" Grid.Column="1"/>
+                    </Grid>
+                    <TextBlock Text="Wettervorhersage" Foreground="White" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <!--weather forecast-->
+                    <StackPanel HorizontalAlignment="Center">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Weather.NextWeekDay}" Foreground="White" HorizontalAlignment="Left"/>
+                            <TextBlock Text="{Binding Weather.NextDayInfo}" Foreground="White" Grid.Row="1" HorizontalAlignment="Left"/>
+                            <Image Source="{Binding Weather.NextDayImageSource}" Grid.RowSpan="2" Grid.Column="1" Height="25" HorizontalAlignment="Right"/>
+                            <TextBlock Text="{Binding Weather.OverNextWeekDay}" Foreground="White" Grid.Row="2" HorizontalAlignment="Left"/>
+                            <TextBlock Text="{Binding Weather.OverNextDayInfo}" Foreground="White" Grid.Row="3" HorizontalAlignment="Left"/>
+                            <Image Source="{Binding Weather.OverNextDayImageSource}" Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" Height="25" HorizontalAlignment="Right"/>
+                            <TextBlock Text="{Binding Weather.OverOverNextWeekDay}" Foreground="White" Grid.Row="4" HorizontalAlignment="Left"/>
+                            <TextBlock Text="{Binding Weather.OverOverNextDayInfo}" Foreground="White" Grid.Row="5" HorizontalAlignment="Left"/>
+                            <Image Source="{Binding Weather.OverOverNextDayImageSource}" Grid.Row="4" Grid.RowSpan="2" Grid.Column="1" Height="25" HorizontalAlignment="Right"/>
+                        </Grid>
+                    </StackPanel>
+                </StackPanel>
+                <!--logo of the weather service-->
+                <Grid  Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Wetter von" Grid.Column="0" Foreground="White" VerticalAlignment="Center"/>
+                    <Image Source="/Images/weatherzone.png"  Grid.Column="1" MaxHeight="24"/>
+                </Grid>
+                <Grid Visibility="{Binding WeatherSpinnerVisibility}" Grid.Row="0" Background="{StaticResource VisualStudioDarkGray}">
+                    <controls:SpinnerControl2 VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Grid>
+            </Grid>
+            <!--<Grid Grid.Column="1" Margin="5,0,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -610,23 +717,27 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0">
-                    
-                <TextBlock Text="Wetter in" Foreground="White" VerticalAlignment="Center"/>
-                <ComboBox ItemsSource="{Binding WeatherLocationsList}" 
+
+                    <TextBlock Text="Wetter in" Foreground="White" VerticalAlignment="Center"/>
+                    <ComboBox ItemsSource="{Binding WeatherLocationsList}" 
                           SelectedItem="{Binding WeatherLocationsList.Current, Mode=TwoWay}" 
                           SelectionChanged="ComboBox_SelectionChanged" HorizontalAlignment="Left"
                           Style="{DynamicResource ComboBoxStyle1}"
                           Foreground="White" ItemContainerStyle="{DynamicResource ComboBoxItemStyle1}">
-                    <ComboBox.Resources>
-                        <!-- Colour of ComboBoxItem -->
-                        <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#FF2D2D30" />
-                        <!-- Mouse over colour of ComboBoxItem -->
-                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF3F3F46" />
-                    </ComboBox.Resources>
-                    <ComboBox.Background>
-                        <StaticResource ResourceKey="VisualStudioLightGray"/>
-                    </ComboBox.Background>
-                </ComboBox>
+                        <ComboBox.Resources>
+                            -->
+            <!-- Colour of ComboBoxItem -->
+            <!--
+                            <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#FF2D2D30" />
+                            -->
+            <!-- Mouse over colour of ComboBoxItem -->
+            <!--
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF3F3F46" />
+                        </ComboBox.Resources>
+                        <ComboBox.Background>
+                            <StaticResource ResourceKey="VisualStudioLightGray"/>
+                        </ComboBox.Background>
+                    </ComboBox>
                 </StackPanel>
 
                 <TextBlock Text="{Binding Weather.UpdateTime, StringFormat=\{0:Ak\\tuali\\sier\\t: dd.MM.yyyy HH:mm U\\hr\}}" Grid.Row="1" Grid.ColumnSpan="2" Foreground="White"/>
@@ -635,7 +746,9 @@
                     <Image Source="{Binding Weather.ImageSource}" VerticalAlignment="Stretch" HorizontalAlignment="Left" Height="55" Margin="10,5,0,0"/>
                 </Grid>
                 <TextBlock Text="" Grid.Row="4"/>
-                <!--Leerzeile-->
+                -->
+            <!--Leerzeile-->
+            <!--
                 <TextBlock Text="{Binding Weather.Feel, StringFormat=Gefühlt: \{0\}}" Grid.Row="3" Grid.ColumnSpan="2" Foreground="White" VerticalAlignment="Top"/>
                 <TextBlock Text="{Binding Weather.Low, StringFormat=Tiefsttemperatur: \{0\}}" Grid.Row="5" Grid.ColumnSpan="2" Foreground="White" />
                 <TextBlock Text="{Binding Weather.High, StringFormat=Höchsttemperatur: \{0\}}" Grid.Row="6" Grid.ColumnSpan="2" Foreground="White" />
@@ -651,20 +764,13 @@
                 <TextBlock Text="{Binding Weather.OverOverNextWeekDay}" Grid.Row="16" Grid.Column="0" Foreground="White"/>
                 <TextBlock Text="{Binding Weather.OverOverNextDayInfo}" Grid.Row="17" Foreground="White"/>
                 <Image Source="{Binding Weather.OverOverNextDayImageSource}" Grid.Row="16" Grid.RowSpan="2" Grid.Column="1" Height="25" HorizontalAlignment="Left"/>
-                <Grid  Grid.Row="20" Grid.ColumnSpan="2" HorizontalAlignment="Center">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="Powered by" Grid.Column="0" Foreground="White" VerticalAlignment="Center"/>
-                    <Image Source="/Images/weatherzone.png"  Grid.Column="1" MaxHeight="24"/>
-                </Grid>
+                
                 <Grid Visibility="{Binding WeatherSpinnerVisibility}" Grid.Row="1" Grid.RowSpan="17" Grid.ColumnSpan="2" Background="{StaticResource VisualStudioDarkGray}">
                     <controls:SpinnerControl2 VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 </Grid>
-            </Grid>
+            </Grid>-->
         </Grid>
-        <!--<Grid Visibility="{Binding LoadingScreenVisibility}" 
+        <Grid Visibility="{Binding LoadingScreenVisibility}" 
               Grid.Row="1" 
               Background="{StaticResource VisualStudioDarkGray}">
             <Grid Grid.ColumnSpan="2">
@@ -675,6 +781,6 @@
                 <controls:SpinnerControl Grid.Row="0" VerticalAlignment="Bottom"/>
                 <Label Content="Aktualisiere Daten..." Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Row="1"/>
             </Grid>
-        </Grid>-->
+        </Grid>
     </Grid>
 </Window>
