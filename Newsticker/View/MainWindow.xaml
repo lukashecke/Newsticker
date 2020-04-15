@@ -482,7 +482,7 @@
                     <Image Source="/Images/minimize.png" Margin="10"/>
                 </Button>
             </StackPanel>
-            
+
             <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight" HorizontalAlignment="Right">
                 <Button Command="{Binding UpdateCommand}"  Style="{StaticResource MyButton}">
                     <Image Source="/Images/newspaper.png" Margin="2"/>
@@ -514,7 +514,7 @@
                     <Slider Minimum="12" Maximum="17" Width="200" Value="{Binding FontSize, Mode=TwoWay}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
                 </Grid>
             </StackPanel>
-                
+
         </DockPanel>
         <Grid Grid.Row="1" Background="{StaticResource VisualStudioDarkGray}">
             <Grid.ColumnDefinitions>
@@ -644,8 +644,8 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Tiefsttemperatur: " Foreground="White" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" FontSize="{Binding FontSize}"/>
                         <TextBlock Text="{Binding Weather.Low}" Foreground="White" HorizontalAlignment="Right" Grid.Row="0" Grid.Column="1" FontSize="{Binding FontSize}"/>
