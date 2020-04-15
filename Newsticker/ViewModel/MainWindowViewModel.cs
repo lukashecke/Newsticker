@@ -45,6 +45,19 @@ namespace Newsticker.ViewModel
         #endregion
 
         #region entities
+        private double fontSize;
+        public double FontSize
+        {
+            get
+            {
+                return this.fontSize;
+            }
+            set
+            {
+                this.fontSize = value;
+                this.OnPropertyChanged("FontSize");
+            }
+        }
         private bool zeitChecked = false;
         public bool ZeitChecked
         {

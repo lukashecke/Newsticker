@@ -482,6 +482,7 @@
                     <Image Source="/Images/minimize.png" Margin="10"/>
                 </Button>
             </StackPanel>
+            
             <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight" HorizontalAlignment="Right">
                 <Button Command="{Binding UpdateCommand}"  Style="{StaticResource MyButton}">
                     <Image Source="/Images/newspaper.png" Margin="2"/>
@@ -504,7 +505,16 @@
                 <ToggleButton Command="{Binding CNNCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding CNNChecked}">
                     <Image Source="/Images/cnn.png" Margin="5,9,5,8"/>
                 </ToggleButton>
+                <Grid Margin="120,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Source="/Images/text_size.png"/>
+                    <Slider Minimum="12" Maximum="17" Width="200" Value="{Binding FontSize, Mode=TwoWay}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
+                </Grid>
             </StackPanel>
+                
         </DockPanel>
         <Grid Grid.Row="1" Background="{StaticResource VisualStudioDarkGray}">
             <Grid.ColumnDefinitions>
@@ -513,7 +523,7 @@
             </Grid.ColumnDefinitions>
             <Label Content="Such dir eine Zeitung aus und Los gehts :)" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding WelcomeTextVisibility}"/>
             <ScrollViewer VerticalScrollBarVisibility="Visible">
-                <ItemsControl ItemsSource="{Binding Articles}" Grid.Column="0">
+                <ItemsControl ItemsSource="{Binding Articles}" Grid.Column="0" x:Name="PART_ItemsControl">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left"/>
@@ -521,7 +531,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid Margin="0,5,0,5" Height="130" Width="530" Grid.RowSpan="2">
+                            <Grid Margin="0,5,0,5"  Width="530" Grid.RowSpan="2">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" MaxWidth="200"/>
                                     <ColumnDefinition Width="*" MinWidth="300"/>
@@ -534,7 +544,7 @@
                                        VerticalAlignment="Center" MaxHeight="120"/>
                                 <Grid Grid.Column="1">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" MaxHeight="112"/>
+                                        <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
                                     <Grid Grid.Column="1">
@@ -547,18 +557,19 @@
                                         </Grid.RowDefinitions>
                                         <TextBlock Text="{Binding Date, StringFormat=\{0:dd.MM.yyyy | HH:mm U\\hr\}}" 
                                            Foreground="White"
-                                           Grid.Column="1" Grid.Row="0" />
+                                           Grid.Column="1" Grid.Row="0" FontSize="{Binding ElementName=PART_ItemsControl, Path=DataContext.FontSize}"/>
                                         <TextBlock Text="{Binding Header}"
                                            Foreground="White"
                                        Grid.Row="1"
                                        Grid.Column="1"
                                        TextWrapping="Wrap"
-                                       FontWeight="Bold"/>
+                                       FontWeight="Bold"
+                                                   FontSize="{Binding ElementName=PART_ItemsControl, Path=DataContext.FontSize}"/>
                                         <TextBlock VerticalAlignment="Top"
                                            Foreground="White"
                                        Grid.Row="2"
                                        Grid.Column="1"
-                                       TextWrapping="Wrap" MaxHeight="65">
+                                       TextWrapping="Wrap" MaxHeight="65" FontSize="{Binding ElementName=PART_ItemsControl, Path=DataContext.FontSize}">
                                             <TextBlock.Style>
                                                 <Style TargetType="{x:Type TextBlock}">
                                                     <Setter Property="Text" Value="{Binding Summary}"/>
@@ -571,7 +582,7 @@
                                             </TextBlock.Style>
                                         </TextBlock>
                                     </Grid>
-                                    <TextBlock Grid.Row="1" VerticalAlignment="Top"><Hyperlink NavigateUri="{Binding Link}" RequestNavigate="Hyperlink_RequestNavigate"><Run Text="Zum Artikel"/></Hyperlink></TextBlock>
+                                    <TextBlock Grid.Row="1" VerticalAlignment="Top" FontSize="{Binding ElementName=PART_ItemsControl, Path=DataContext.FontSize}"><Hyperlink NavigateUri="{Binding Link}" RequestNavigate="Hyperlink_RequestNavigate"><Run Text="Zum Artikel"/></Hyperlink></TextBlock>
                                 </Grid>
                             </Grid>
                         </DataTemplate>
@@ -586,12 +597,12 @@
                 <StackPanel  Orientation="Vertical">
                     <!--location-->
                     <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0" HorizontalAlignment="Center">
-                        <TextBlock Text="Wetter in" Foreground="White" VerticalAlignment="Center"/>
+                        <TextBlock Text="Wetter in" Foreground="White" VerticalAlignment="Center" FontSize="{Binding FontSize}"/>
                         <ComboBox ItemsSource="{Binding WeatherLocationsList}" 
                           SelectedItem="{Binding WeatherLocationsList.Current, Mode=TwoWay}" 
                           SelectionChanged="ComboBox_SelectionChanged" HorizontalAlignment="Left"
                           Style="{DynamicResource ComboBoxStyle1}"
-                          Foreground="White" ItemContainerStyle="{DynamicResource ComboBoxItemStyle1}">
+                          Foreground="White" ItemContainerStyle="{DynamicResource ComboBoxItemStyle1}" FontSize="{Binding FontSize}">
                             <ComboBox.Resources>
                                 <!-- Colour of ComboBoxItem -->
                                 <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#FF2D2D30" />
@@ -604,9 +615,9 @@
                         </ComboBox>
                     </StackPanel>
                     <!--updatetime-->
-                    <TextBlock Text="{Binding Weather.UpdateTime, StringFormat=\{0:Ak\\tuali\\sier\\t: dd.MM.yyyy HH:mm U\\hr\}}" Grid.Row="1" Grid.ColumnSpan="2" Foreground="White" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding Weather.UpdateTime, StringFormat=\{0:Ak\\tuali\\sier\\t: dd.MM.yyyy HH:mm U\\hr\}}" Grid.Row="1" Grid.ColumnSpan="2" Foreground="White" HorizontalAlignment="Center" />
                     <!--current weather-->
-                    <Grid HorizontalAlignment="Center">
+                    <Grid HorizontalAlignment="Stretch" Margin="10,10,10,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
@@ -616,15 +627,15 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            <TextBlock Text="{Binding Weather.Temperature}" Foreground="White" FontSize="35" VerticalAlignment="Bottom"/>
-                            <TextBlock Text="{Binding Weather.Feel, StringFormat=Gefühlt: \{0\}}" Grid.Row="1" Grid.ColumnSpan="2" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding Weather.Temperature}" Foreground="White" FontSize="35" VerticalAlignment="Bottom" />
+                            <TextBlock Text="{Binding Weather.Feel, StringFormat=Gefühlt: \{0\}}" Grid.Row="1" Grid.ColumnSpan="2" Foreground="White" HorizontalAlignment="Center" FontSize="{Binding FontSize}"/>
                         </Grid>
-                        <Grid Grid.Column="1" Margin="0,2,10,10" >
-                            <Image Source="{Binding Weather.ImageSource}"  HorizontalAlignment="Left" Height="60" Margin="10,5,0,0"/>
+                        <Grid Grid.Column="1" Grid.RowSpan="2" HorizontalAlignment="Right" Margin="0,2,10,10" >
+                            <Image Source="{Binding Weather.ImageSource}"  HorizontalAlignment="Right" Height="50"/>
                         </Grid>
                     </Grid>
                     <!--more information-->
-                    <Grid HorizontalAlignment="Center">
+                    <Grid HorizontalAlignment="Stretch" Margin="10,10,10,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="*"/>
@@ -634,22 +645,22 @@
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Tiefsttemperatur: " Foreground="White" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0"/>
-                        <TextBlock Text="{Binding Weather.Low}" Foreground="White" HorizontalAlignment="Right" Grid.Row="0" Grid.Column="1"/>
-                        <TextBlock Text="Höchsttemperatur: " Foreground="White" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="0"/>
-                        <TextBlock Text="{Binding Weather.High}" Foreground="White" HorizontalAlignment="Right" Grid.Row="1" Grid.Column="1"/>
-                        <TextBlock Text="Taupunkt: " Foreground="White" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="0"/>
-                        <TextBlock Text="{Binding Weather.DewPoint}" Foreground="White" HorizontalAlignment="Right" Grid.Row="2" Grid.Column="1"/>
-                        <TextBlock Text="Luftfeuchtigkeit: " Foreground="White" HorizontalAlignment="Left" Grid.Row="3" Grid.Column="0"/>
-                        <TextBlock Text="{Binding Weather.RelativeHumidity}" Foreground="White" HorizontalAlignment="Right" Grid.Row="3" Grid.Column="1"/>
-                        <TextBlock Text="Luftdruck: " Foreground="White" HorizontalAlignment="Left" Grid.Row="4" Grid.Column="0"/>
-                        <TextBlock Text="{Binding Weather.Pressure}" Foreground="White" HorizontalAlignment="Right" Grid.Row="4" Grid.Column="1"/>
+                        <TextBlock Text="Tiefsttemperatur: " Foreground="White" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" FontSize="{Binding FontSize}"/>
+                        <TextBlock Text="{Binding Weather.Low}" Foreground="White" HorizontalAlignment="Right" Grid.Row="0" Grid.Column="1" FontSize="{Binding FontSize}"/>
+                        <TextBlock Text="Höchsttemperatur: " Foreground="White" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="0" FontSize="{Binding FontSize}"/>
+                        <TextBlock Text="{Binding Weather.High}" Foreground="White" HorizontalAlignment="Right" Grid.Row="1" Grid.Column="1" FontSize="{Binding FontSize}"/>
+                        <TextBlock Text="Taupunkt: " Foreground="White" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="0" FontSize="{Binding FontSize}"/>
+                        <TextBlock Text="{Binding Weather.DewPoint}" Foreground="White" HorizontalAlignment="Right" Grid.Row="2" Grid.Column="1" FontSize="{Binding FontSize}"/>
+                        <TextBlock Text="Luftfeuchtigkeit: " Foreground="White" HorizontalAlignment="Left" Grid.Row="3" Grid.Column="0" FontSize="{Binding FontSize}"/>
+                        <TextBlock Text="{Binding Weather.RelativeHumidity}" Foreground="White" HorizontalAlignment="Right" Grid.Row="3" Grid.Column="1" FontSize="{Binding FontSize}"/>
+                        <TextBlock Text="Luftdruck: " Foreground="White" HorizontalAlignment="Left" Grid.Row="4" Grid.Column="0" FontSize="{Binding FontSize}"/>
+                        <TextBlock Text="{Binding Weather.Pressure}" Foreground="White" HorizontalAlignment="Right" Grid.Row="4" Grid.Column="1" FontSize="{Binding FontSize}"/>
                     </Grid>
-                    <TextBlock Text="Wettervorhersage" Foreground="White" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <TextBlock Text="Wettervorhersage" Foreground="White" HorizontalAlignment="Center" FontWeight="Bold" Margin="10,10,10,0" FontSize="{Binding FontSize}"/>
                     <!--weather forecast-->
-                    <StackPanel HorizontalAlignment="Center">
+                    <StackPanel HorizontalAlignment="Stretch" Margin="10,10,10,0">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
@@ -663,15 +674,15 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Weather.NextWeekDay}" Foreground="White" HorizontalAlignment="Left"/>
-                            <TextBlock Text="{Binding Weather.NextDayInfo}" Foreground="White" Grid.Row="1" HorizontalAlignment="Left"/>
-                            <Image Source="{Binding Weather.NextDayImageSource}" Grid.RowSpan="2" Grid.Column="1" Height="25" HorizontalAlignment="Right"/>
-                            <TextBlock Text="{Binding Weather.OverNextWeekDay}" Foreground="White" Grid.Row="2" HorizontalAlignment="Left"/>
-                            <TextBlock Text="{Binding Weather.OverNextDayInfo}" Foreground="White" Grid.Row="3" HorizontalAlignment="Left"/>
-                            <Image Source="{Binding Weather.OverNextDayImageSource}" Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" Height="25" HorizontalAlignment="Right"/>
-                            <TextBlock Text="{Binding Weather.OverOverNextWeekDay}" Foreground="White" Grid.Row="4" HorizontalAlignment="Left"/>
-                            <TextBlock Text="{Binding Weather.OverOverNextDayInfo}" Foreground="White" Grid.Row="5" HorizontalAlignment="Left"/>
-                            <Image Source="{Binding Weather.OverOverNextDayImageSource}" Grid.Row="4" Grid.RowSpan="2" Grid.Column="1" Height="25" HorizontalAlignment="Right"/>
+                            <TextBlock Text="{Binding Weather.NextWeekDay}" Foreground="White" HorizontalAlignment="Left" FontSize="{Binding FontSize}"/>
+                            <TextBlock Text="{Binding Weather.NextDayInfo}" Foreground="White" Grid.Row="1" HorizontalAlignment="Left" Margin="0,0,0,5" FontSize="{Binding FontSize}"/>
+                            <Image Source="{Binding Weather.NextDayImageSource}" Grid.RowSpan="2" Grid.Column="1" Height="25" HorizontalAlignment="Right" Margin="10,0,0,0"/>
+                            <TextBlock Text="{Binding Weather.OverNextWeekDay}" Foreground="White" Grid.Row="2" HorizontalAlignment="Left" FontSize="{Binding FontSize}"/>
+                            <TextBlock Text="{Binding Weather.OverNextDayInfo}" Foreground="White" Grid.Row="3" HorizontalAlignment="Left" Margin="0,0,0,5" FontSize="{Binding FontSize}"/>
+                            <Image Source="{Binding Weather.OverNextDayImageSource}" Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" Height="25" HorizontalAlignment="Right" Margin="10,0,0,0" />
+                            <TextBlock Text="{Binding Weather.OverOverNextWeekDay}" Foreground="White" Grid.Row="4" HorizontalAlignment="Left" FontSize="{Binding FontSize}"/>
+                            <TextBlock Text="{Binding Weather.OverOverNextDayInfo}" Foreground="White" Grid.Row="5" HorizontalAlignment="Left" Margin="0,0,0,5" FontSize="{Binding FontSize}"/>
+                            <Image Source="{Binding Weather.OverOverNextDayImageSource}" Grid.Row="4" Grid.RowSpan="2" Grid.Column="1" Height="25" HorizontalAlignment="Right" Margin="10,0,0,0" />
                         </Grid>
                     </StackPanel>
                 </StackPanel>

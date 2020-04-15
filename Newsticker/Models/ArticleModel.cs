@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Newsticker.Models
 {
-    class ArticleModel
+    class ArticleModel : ModelBase
     {
         public string Header { get; set; }
         public string Summary { get; set; }
