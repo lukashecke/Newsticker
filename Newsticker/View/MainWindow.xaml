@@ -570,7 +570,7 @@
                                            Foreground="White"
                                        Grid.Row="2"
                                        Grid.Column="1"
-                                       TextWrapping="Wrap" MaxHeight="65" FontSize="{Binding ElementName=PART_ItemsControl, Path=DataContext.FontSize}">
+                                       TextWrapping="Wrap" MaxHeight="68" FontSize="{Binding ElementName=PART_ItemsControl, Path=DataContext.FontSize}">
                                             <TextBlock.Style>
                                                 <Style TargetType="{x:Type TextBlock}">
                                                     <Setter Property="Text" Value="{Binding Summary}"/>
