@@ -42,6 +42,13 @@ namespace Newsticker.ViewModel
         public ICommand NZZCommand { get; set; }
         public ICommand ZeitCommand { get; set; }
         public ICommand UpdateCommand { get; set; }
+        private double ZeitScrollOffset { get; set; }
+        private double FAZScrollOffset { get; set; }
+        private double SZScrollOffset { get; set; }
+        private double NZZScrollOffset { get; set; }
+        private double TagesschauScrollOffset { get; set; }
+        private double CNNScrollOffset { get; set; }
+        private string CurrentNewspaper { get; set; }
         #endregion
 
         #region entities
@@ -319,70 +326,122 @@ namespace Newsticker.ViewModel
         // TODO: Wenn zwischen den einzelnen reitern der Zeitschriften rumgesprungen wird, soll der scroller immer wieder am start der seite sein, bislang wird diese information weitergegeben, wenn zb sz zu ende gelesen und auf cnn geklickt wird befindet man sich am ende der seite
         private void ExecuteUpdateCommand(object obj)
         {
+            ClearScrollOffsets();
             LoadAllComponents();
         }
+
+        private void ClearScrollOffsets()
+        {
+            ((MainWindow)App.Current.MainWindow).PART_Scrollbar.ScrollToVerticalOffset(0);
+            ZeitScrollOffset = 0;
+            FAZScrollOffset = 0;
+            SZScrollOffset = 0;
+            NZZScrollOffset = 0;
+            TagesschauScrollOffset = 0;
+            CNNScrollOffset = 0;
+        }
+
         private void ExecuteNZZCommand(object obj)
         {
+            SafeScrollOffset();
             NZZChecked = true;
             ZeitChecked = false;
             TagesschauChecked = false;
             FAZChecked = false;
             SZChecked = false;
             CNNChecked = false;
+            ((MainWindow)App.Current.MainWindow).PART_Scrollbar.ScrollToVerticalOffset(NZZScrollOffset);
             Articles = Cache["NZZ"];
+            CurrentNewspaper = "NZZ";
         }
         private void ExecuteCNNCommand(object obj)
         {
+            SafeScrollOffset();
             NZZChecked = false;
             ZeitChecked = false;
             TagesschauChecked = false;
             FAZChecked = false;
             SZChecked = false;
             CNNChecked = true;
+            ((MainWindow)App.Current.MainWindow).PART_Scrollbar.ScrollToVerticalOffset(CNNScrollOffset);
             Articles = Cache["CNN"];
+            CurrentNewspaper = "CNN";
+        }
+
+        private void SafeScrollOffset()
+        {
+            switch (CurrentNewspaper)
+            {
+                case "Zeit": ZeitScrollOffset = ((MainWindow)App.Current.MainWindow).PART_Scrollbar.VerticalOffset;
+                    break;
+                case "FAZ": FAZScrollOffset = ((MainWindow)App.Current.MainWindow).PART_Scrollbar.VerticalOffset;
+                    break;
+                case "SZ": SZScrollOffset = ((MainWindow)App.Current.MainWindow).PART_Scrollbar.VerticalOffset;
+                    break;
+                case "NZZ":NZZScrollOffset = ((MainWindow)App.Current.MainWindow).PART_Scrollbar.VerticalOffset;
+                    break;
+                case "Tagesschau": TagesschauScrollOffset = ((MainWindow)App.Current.MainWindow).PART_Scrollbar.VerticalOffset;
+                    break;
+                case "CNN": CNNScrollOffset = ((MainWindow)App.Current.MainWindow).PART_Scrollbar.VerticalOffset;
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void ExecuteSZCommand(object obj)
         {
+            SafeScrollOffset();
             NZZChecked = false;
             ZeitChecked = false;
             TagesschauChecked = false;
             FAZChecked = false;
             SZChecked = true;
             CNNChecked = false;
+            ((MainWindow)App.Current.MainWindow).PART_Scrollbar.ScrollToVerticalOffset(SZScrollOffset);
             Articles = Cache["SZ"];
+            CurrentNewspaper = "SZ";
         }
 
         private void ExecuteFAZCommand(object obj)
         {
+            SafeScrollOffset();
             NZZChecked = false;
             ZeitChecked = false;
             TagesschauChecked = false;
             FAZChecked = true;
             SZChecked = false;
             CNNChecked = false;
+            ((MainWindow)App.Current.MainWindow).PART_Scrollbar.ScrollToVerticalOffset(FAZScrollOffset);
             Articles = Cache["FAZ"];
+            CurrentNewspaper = "FAZ";
         }
 
         private void ExecuteTagesschauCommand(object obj)
         {
+            SafeScrollOffset();
             NZZChecked = false;
             ZeitChecked = false;
             TagesschauChecked = true;
             FAZChecked = false;
             SZChecked = false;
             CNNChecked = false;
+            ((MainWindow)App.Current.MainWindow).PART_Scrollbar.ScrollToVerticalOffset(TagesschauScrollOffset);
             Articles = Cache["Tagesschau"];
+            CurrentNewspaper = "Tagesschau";
         }
         private void ExecuteZeitCommand(object obj)
         {
+            SafeScrollOffset();
             NZZChecked = false;
             ZeitChecked = true;
             TagesschauChecked = false;
             FAZChecked = false;
             SZChecked = false;
             CNNChecked = false;
+            ((MainWindow)App.Current.MainWindow).PART_Scrollbar.ScrollToVerticalOffset(ZeitScrollOffset);
             Articles = Cache["Zeit"];
+            CurrentNewspaper = "Zeit";
         }
         #region canExecutes
         private bool CanExecuteNZZ(object arg)

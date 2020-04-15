@@ -469,52 +469,53 @@
             <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <DockPanel MouseLeftButtonDown="DockPanel_MouseLeftButtonDown" Background="{StaticResource VisualStudioGray}" FlowDirection="RightToLeft">
-            <!--FlowDirection RightToLeft so the Buttons can Overlay the Buttons-->
-            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" MinWidth="152" Background="{StaticResource VisualStudioGray}">
+        <DockPanel MouseLeftButtonDown="DockPanel_MouseLeftButtonDown" Background="{StaticResource VisualStudioGray}">
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Background="{StaticResource VisualStudioGray}" DockPanel.Dock="Right" MinWidth="154" FlowDirection="RightToLeft">
                 <Button Command="{Binding CloseCommand}" Background="Transparent"  BorderThickness="0" Style="{StaticResource CloseButton}">
                     <Image Source="/Images/close.png" Margin="10"/>
                 </Button>
                 <Button Command="{Binding RestoreCommand}" Style="{StaticResource MyButton}">
                     <Image Source="{Binding RestoreButton}"  Margin="9"/>
                 </Button>
-                <Button Command="{Binding MinimizeCommand}" Style="{StaticResource MyButton}"  >
+                <Button Command="{Binding MinimizeCommand}" Style="{StaticResource MyButton}">
                     <Image Source="/Images/minimize.png" Margin="10"/>
                 </Button>
             </StackPanel>
-
-            <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight" HorizontalAlignment="Right">
-                <Button Command="{Binding UpdateCommand}"  Style="{StaticResource MyButton}">
-                    <Image Source="/Images/newspaper.png" Margin="2"/>
-                </Button>
-                <ToggleButton Command="{Binding ZeitCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding ZeitChecked}">
-                    <Image Source="/Images/zeit.png" Margin="5,8,5,6"/>
-                </ToggleButton>
-                <ToggleButton Command="{Binding FAZCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding FAZChecked}">
-                    <Image Source="/Images/faz.png" Margin="5,7,5,2"/>
-                </ToggleButton>
-                <ToggleButton Command="{Binding SZCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding SZChecked}">
-                    <Image Source="/Images/sz.png" Margin="5,10,5,3"/>
-                </ToggleButton>
-                <ToggleButton Command="{Binding NZZCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding NZZChecked}">
-                    <Image Source="/Images/nzz.png" Margin="5,10,5,3"/>
-                </ToggleButton>
-                <ToggleButton Command="{Binding TagesschauCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding TagesschauChecked}">
-                    <Image Source="/Images/tagesschau.png" Margin="5,9,5,3"/>
-                </ToggleButton>
-                <ToggleButton Command="{Binding CNNCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding CNNChecked}">
-                    <Image Source="/Images/cnn.png" Margin="5,9,5,8"/>
-                </ToggleButton>
-                <Grid Margin="120,0,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Image Source="/Images/text_size.png"/>
-                    <Slider Minimum="12" Maximum="17" Width="200" Value="{Binding FontSize, Mode=TwoWay}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
-                </Grid>
-            </StackPanel>
-
+            
+            <Grid DockPanel.Dock="Left">
+                <StackPanel Grid.Column="0"  Orientation="Horizontal">
+                    <Button Command="{Binding UpdateCommand}"  Style="{StaticResource MyButton}">
+                        <Image Source="/Images/newspaper.png" Margin="2"/>
+                    </Button>
+                    <ToggleButton Command="{Binding ZeitCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding ZeitChecked}">
+                        <Image Source="/Images/zeit.png" Margin="5,8,5,6"/>
+                    </ToggleButton>
+                    <ToggleButton Command="{Binding FAZCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding FAZChecked}">
+                        <Image Source="/Images/faz.png" Margin="5,7,5,2"/>
+                    </ToggleButton>
+                    <ToggleButton Command="{Binding SZCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding SZChecked}">
+                        <Image Source="/Images/sz.png" Margin="5,10,5,3"/>
+                    </ToggleButton>
+                    <ToggleButton Command="{Binding NZZCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding NZZChecked}">
+                        <Image Source="/Images/nzz.png" Margin="5,10,5,3"/>
+                    </ToggleButton>
+                    <ToggleButton Command="{Binding TagesschauCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding TagesschauChecked}">
+                        <Image Source="/Images/tagesschau.png" Margin="5,9,5,3"/>
+                    </ToggleButton>
+                    <ToggleButton Command="{Binding CNNCommand}" Style="{StaticResource DockButton}" IsChecked="{Binding CNNChecked}">
+                        <Image Source="/Images/cnn.png" Margin="5,9,5,8"/>
+                    </ToggleButton>
+                </StackPanel>
+            </Grid>
+            <Grid HorizontalAlignment="Center" Margin="44,0,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Image Source="/Images/text_size.png" Grid.Column="0"/>
+                <Slider Grid.Column="1" Minimum="12" Maximum="17" Width="200" Value="{Binding FontSize, Mode=TwoWay}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Grid>
         </DockPanel>
         <Grid Grid.Row="1" Background="{StaticResource VisualStudioDarkGray}">
             <Grid.ColumnDefinitions>
@@ -522,7 +523,7 @@
                 <ColumnDefinition Width="*" MaxWidth="300"/>
             </Grid.ColumnDefinitions>
             <Label Content="Such dir eine Zeitung aus und Los gehts :)" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding WelcomeTextVisibility}"/>
-            <ScrollViewer VerticalScrollBarVisibility="Visible">
+            <ScrollViewer Name="PART_Scrollbar">
                 <ItemsControl ItemsSource="{Binding Articles}" Grid.Column="0" x:Name="PART_ItemsControl">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
