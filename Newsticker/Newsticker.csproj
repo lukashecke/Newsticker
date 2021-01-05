@@ -226,5 +226,20 @@
   <ItemGroup>
     <Resource Include="Images\text_size.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Weather\late_shower.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Weather\possible_shower.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Weather\snow_showers.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Weather\snow_developing.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Weather\snowfalls_clearing.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
